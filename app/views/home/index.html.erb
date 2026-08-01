@@ -1,13 +1,39 @@
 <div class="container py-5 text-center">
 
-  <h1 class="display-4 fw-bold">
-    Welcome to SocialHub
-  </h1>
+  <h1 class="display-4 fw-bold">Welcome to SocialHub</h1>
+  <p class="lead mt-3">Connect, Share and Build Communities.</p>
+  <% if user_signed_in? %>
+    <%= link_to "View My Posts", posts_path, class: "btn btn-primary btn-lg mt-3" %>
+  <% else %>
+    <%= link_to "Get Started", new_user_registration_path, class: "btn btn-primary btn-lg mt-3" %>
+  <% end %>
 
-  <p class="lead mt-3">
-    Connect, Share and Build Communities.
-  </p>
-
-  <%= link_to "Get Started", new_user_registration_path, class: "btn btn-primary btn-lg mt-3" %>
-
+  <div class="row justify-content-center mt-5">
+    <div class="col-lg-8">
+      <h3 class="mb-4">Latest Posts</h3>
+      <% if @posts.any? %>
+        <% @posts.each do |post| %>
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <h6 class="fw-bold text-primary mb-2"><%= post.user.profile&.username || post.user.email.split("@").first %></h6>
+              <p class="mb-2"><%= post.content %></p>
+              <small class="text-muted"><%= time_ago_in_words(post.created_at) %> ago</small>
+              <% if user_signed_in? %>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <% if current_user.likes.exists?(post: post) %>
+                    <%= button_to "❤️ Unlike", post_like_path(post), method: :delete, class: "btn btn-danger btn-sm me-2" %>
+                  <% else %>
+                    <%= button_to "🤍 Like", post_like_path(post), method: :post, class: "btn btn-outline-danger btn-sm me-2" %>
+                  <% end %>
+                  <small class="text-muted"><%= pluralize(post.likes.count, "Like") %></small>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="alert alert-info">No posts available.</div>
+      <% end %>
+    </div>
+  </div>
 </div>
