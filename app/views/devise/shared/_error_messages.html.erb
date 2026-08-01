@@ -1,0 +1,15 @@
+<% if resource.errors.any? %>
+  <div class="alert alert-danger">
+
+    <h6 class="fw-bold mb-2">
+      Please fix the following errors:
+    </h6>
+
+    <ul class="mb-0">
+      <% resource.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+
+  </div>
+<% end %>

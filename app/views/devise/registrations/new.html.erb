@@ -1,0 +1,70 @@
+<div class="container">
+  <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5">
+
+      <div class="card shadow border-0 rounded-4">
+        <div class="card-body p-5">
+
+          <div class="text-center mb-4">
+            <h2 class="fw-bold">Create Account</h2>
+            <p class="text-muted">Join SocialHub and start connecting</p>
+          </div>
+
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+
+            <%= render "devise/shared/error_messages", resource: resource %>
+
+            <div class="mb-3">
+              <%= f.label :email, class: "form-label" %>
+              <%= f.email_field :email,
+                                autofocus: true,
+                                autocomplete: "email",
+                                class: "form-control",
+                                placeholder: "Enter your email" %>
+            </div>
+
+            <div class="mb-3">
+              <%= f.label :password, class: "form-label" %>
+
+              <% if @minimum_password_length %>
+                <small class="text-muted d-block mb-2">
+                  Minimum <%= @minimum_password_length %> characters
+                </small>
+              <% end %>
+
+              <%= f.password_field :password,
+                                   autocomplete: "new-password",
+                                   class: "form-control",
+                                   placeholder: "Create a password" %>
+            </div>
+
+            <div class="mb-4">
+              <%= f.label :password_confirmation, class: "form-label" %>
+              <%= f.password_field :password_confirmation,
+                                   autocomplete: "new-password",
+                                   class: "form-control",
+                                   placeholder: "Confirm your password" %>
+            </div>
+
+            <div class="d-grid">
+              <%= f.submit "Create Account", class: "btn btn-primary btn-lg" %>
+            </div>
+
+          <% end %>
+
+          <div class="text-center mt-4">
+            <p class="mb-1">
+              Already have an account?
+            </p>
+
+            <%= link_to "Log in",
+                        new_user_session_path,
+                        class: "text-decoration-none fw-semibold" %>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
