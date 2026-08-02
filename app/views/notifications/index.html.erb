@@ -1,0 +1,45 @@
+<div class="container mt-5">
+
+  <h2 class="mb-4">Notifications</h2>
+
+  <% if @notifications.any? %>
+
+    <% @notifications.each do |notification| %>
+
+      <div class="card mb-3 shadow-sm">
+
+        <div class="card-body">
+
+          <strong>
+            <%= notification.actor.profile&.username || notification.actor.email.split("@").first %>
+          </strong>
+
+          <% if notification.action == "liked" %>
+            liked your post ❤️
+          <% elsif notification.action == "commented" %>
+            commented on your post 💬
+          <% elsif notification.action == "followed" %>
+            started following you 👤
+          <% end %>
+
+          <br>
+
+          <small class="text-muted">
+            <%= time_ago_in_words(notification.created_at) %> ago
+          </small>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  <% else %>
+
+    <div class="alert alert-info">
+      No notifications yet.
+    </div>
+
+  <% end %>
+
+</div>

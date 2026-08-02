@@ -1,39 +1,206 @@
 <div class="container py-5 text-center">
 
-  <h1 class="display-4 fw-bold">Welcome to SocialHub</h1>
-  <p class="lead mt-3">Connect, Share and Build Communities.</p>
+  <h1 class="display-4 fw-bold">
+    Welcome to SocialHub
+  </h1>
+
+  <p class="lead mt-3">
+    Connect, Share and Build Communities.
+  </p>
+
   <% if user_signed_in? %>
-    <%= link_to "View My Posts", posts_path, class: "btn btn-primary btn-lg mt-3" %>
+    <%= link_to "View My Posts",
+                posts_path,
+                class: "btn btn-primary btn-lg mt-3" %>
   <% else %>
-    <%= link_to "Get Started", new_user_registration_path, class: "btn btn-primary btn-lg mt-3" %>
+    <%= link_to "Get Started",
+                new_user_registration_path,
+                class: "btn btn-primary btn-lg mt-3" %>
   <% end %>
 
   <div class="row justify-content-center mt-5">
     <div class="col-lg-8">
+
       <h3 class="mb-4">Latest Posts</h3>
+
       <% if @posts.any? %>
+
         <% @posts.each do |post| %>
+
           <div class="card shadow-sm mb-3">
             <div class="card-body">
-              <h6 class="fw-bold text-primary mb-2"><%= post.user.profile&.username || post.user.email.split("@").first %></h6>
-              <p class="mb-2"><%= post.content %></p>
-              <small class="text-muted"><%= time_ago_in_words(post.created_at) %> ago</small>
-              <% if user_signed_in? %>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                  <% if current_user.likes.exists?(post: post) %>
-                    <%= button_to "❤️ Unlike", post_like_path(post), method: :delete, class: "btn btn-danger btn-sm me-2" %>
-                  <% else %>
-                    <%= button_to "🤍 Like", post_like_path(post), method: :post, class: "btn btn-outline-danger btn-sm me-2" %>
-                  <% end %>
-                  <small class="text-muted"><%= pluralize(post.likes.count, "Like") %></small>
+
+              <h6 class="fw-bold text-primary mb-2">
+                <%= post.user.profile&.username || post.user.email.split("@").first %>
+              </h6>
+
+              <% if user_signed_in? && current_user != post.user %>
+
+                <% if current_user.following.include?(post.user) %>
+
+                  <%= button_to "Following",
+                                user_follow_path(post.user),
+                                method: :delete,
+                                class: "btn btn-outline-secondary btn-sm mb-2" %>
+
+                <% else %>
+
+                  <%= button_to "Follow",
+                                user_follow_path(post.user),
+                                method: :post,
+                                class: "btn btn-primary btn-sm mb-2" %>
+
+                <% end %>
+
+              <% end %>
+
+              <p class="mb-2">
+                <%= render_hashtags(post.content) %>
+              </p>
+
+              <% if post.image.attached? %>
+                <div class="mt-3 mb-3">
+                  <%= image_tag post.image,
+                                class: "img-fluid rounded" %>
                 </div>
               <% end %>
+
+              <small class="text-muted">
+                <%= time_ago_in_words(post.created_at) %> ago
+              </small>
+
+              <% if user_signed_in? %>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+
+                  <% if current_user.likes.exists?(post: post) %>
+
+                    <%= button_to "❤️ Unlike",
+                                  post_like_path(post),
+                                  method: :delete,
+                                  class: "btn btn-danger btn-sm" %>
+
+                  <% else %>
+
+                    <%= button_to "🤍 Like",
+                                  post_like_path(post),
+                                  method: :post,
+                                  class: "btn btn-outline-danger btn-sm" %>
+
+                  <% end %>
+
+                  <div class="mt-2">
+
+                    <% if current_user.saved.include?(post) %>
+
+                      <%= button_to "🔖 Saved",
+                                    post_saved_post_path(post),
+                                    method: :delete,
+                                    class: "btn btn-outline-warning btn-sm" %>
+
+                    <% else %>
+
+                      <%= button_to "🔖 Save",
+                                    post_saved_post_path(post),
+                                    method: :post,
+                                    class: "btn btn-outline-dark btn-sm" %>
+
+                    <% end %>
+
+                  </div>
+
+                  <small class="text-muted">
+                    <%= pluralize(post.likes.count, "Like") %>
+                  </small>
+
+                </div>
+
+              <% end %>
+
+              <hr>
+
+              <h6 class="fw-bold">Comments</h6>
+
+              <% if post.comments.any? %>
+
+                <% post.comments.each do |comment| %>
+
+                  <div class="border rounded p-2 mb-2 text-start">
+
+                    <strong class="text-primary">
+                      <%= comment.user.profile&.username || comment.user.email.split("@").first %>
+                    </strong>
+
+                    <p class="mb-1">
+                      <%= comment.content %>
+                    </p>
+
+                    <small class="text-muted">
+                      <%= time_ago_in_words(comment.created_at) %> ago
+                    </small>
+
+                    <% if user_signed_in? && comment.user == current_user %>
+
+                      <div class="mt-2 d-flex gap-2">
+
+                        <%= link_to "Edit",
+                                    edit_post_comment_path(post, comment),
+                                    class: "btn btn-outline-primary btn-sm" %>
+
+                        <%= button_to "Delete",
+                                      post_comment_path(post, comment),
+                                      method: :delete,
+                                      class: "btn btn-outline-danger btn-sm" %>
+                      </div>
+
+                    <% end %>
+
+                  </div>
+
+                <% end %>
+
+              <% else %>
+
+                <p class="text-muted">
+                  No comments yet.
+                </p>
+
+              <% end %>
+
+              <% if user_signed_in? %>
+
+                <%= form_with model: [post, Comment.new], local: true do |f| %>
+
+                  <div class="mb-2">
+
+                    <%= f.text_area :content,
+                                    rows: 2,
+                                    class: "form-control",
+                                    placeholder: "Write a comment..." %>
+
+                  </div>
+
+                  <%= f.submit "Add Comment",
+                               class: "btn btn-primary btn-sm" %>
+
+                <% end %>
+
+              <% end %>
+
             </div>
           </div>
+
         <% end %>
+
       <% else %>
-        <div class="alert alert-info">No posts available.</div>
+
+        <div class="alert alert-info">
+          No posts available.
+        </div>
+
       <% end %>
+
     </div>
   </div>
+
 </div>

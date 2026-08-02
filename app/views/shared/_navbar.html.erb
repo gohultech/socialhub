@@ -15,6 +15,32 @@
         </li>
 
         <li class="nav-item">
+          <%= link_to "Saved", saved_posts_path, class: "nav-link" %>
+        </li>
+
+        <li class="nav-item">
+          <%= link_to "Search", search_path, class: "nav-link" %>
+        </li>
+
+        <% if user_signed_in? %>
+
+          <% unread = current_user.notifications.where(read: false).count %>
+
+          <li class="nav-item">
+            <%= link_to notifications_path, class: "nav-link" do %>
+              Notifications
+
+              <% if unread > 0 %>
+        <span class="badge bg-danger">
+          <%= unread %>
+        </span>
+              <% end %>
+            <% end %>
+          </li>
+
+        <% end %>
+
+        <li class="nav-item">
           <%= link_to "Profile", profile_path, class: "nav-link" %>
         </li>
 

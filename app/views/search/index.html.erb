@@ -1,0 +1,56 @@
+<div class="container mt-5">
+
+  <h2 class="mb-4">Search Users</h2>
+
+  <%= form_with url: search_path, method: :get, local: true do %>
+
+    <div class="input-group mb-4">
+
+      <%= text_field_tag :query,
+                         params[:query],
+                         class: "form-control",
+                         placeholder: "Search by username..." %>
+
+      <button class="btn btn-primary">
+        Search
+      </button>
+
+    </div>
+
+  <% end %>
+
+  <% if @users.any? %>
+
+    <% @users.each do |user| %>
+
+      <div class="card mb-2">
+
+        <div class="card-body">
+
+          <strong>
+            <%= link_to user.profile.username,
+                        user_path(user),
+                        class: "text-decoration-none" %>
+          </strong>
+
+          <br>
+
+          <small>
+            <%= user.email %>
+          </small>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  <% elsif params[:query].present? %>
+
+    <div class="alert alert-warning">
+      No users found.
+    </div>
+
+  <% end %>
+
+</div>

@@ -1,0 +1,70 @@
+<div class="container mt-5">
+
+  <div class="card shadow p-4">
+
+    <h2>
+      <%= @user.profile.username %>
+    </h2>
+
+    <% if current_user != @user %>
+
+      <% if current_user.following.include?(@user) %>
+
+        <%= button_to "Following",
+                      user_follow_path(@user),
+                      method: :delete,
+                      class: "btn btn-outline-secondary mt-3" %>
+
+      <% else %>
+
+        <%= button_to "Follow",
+                      user_follow_path(@user),
+                      method: :post,
+                      class: "btn btn-primary mt-3" %>
+
+      <% end %>
+
+    <% end %>
+
+    <div class="row text-center my-4">
+
+      <div class="col">
+        <h4><%= @user.posts.count %></h4>
+        <small>Posts</small>
+      </div>
+
+      <div class="col">
+        <h4><%= @user.followers.count %></h4>
+        <small>Followers</small>
+      </div>
+
+      <div class="col">
+        <h4><%= @user.following.count %></h4>
+        <small>Following</small>
+      </div>
+
+    </div>
+
+  </div>
+
+  <h3 class="mt-5 mb-3">Posts</h3>
+
+  <% @posts.each do |post| %>
+
+    <div class="card mb-3">
+
+      <div class="card-body">
+
+        <p><%= render_hashtags(post.content) %></p>
+
+        <small class="text-muted">
+          <%= time_ago_in_words(post.created_at) %> ago
+        </small>
+
+      </div>
+
+    </div>
+
+  <% end %>
+
+</div>

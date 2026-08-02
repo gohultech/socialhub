@@ -4,6 +4,39 @@
 
     <h2 class="mb-4">My Profile</h2>
 
+    <div class="row text-center mb-4">
+
+      <div class="col">
+        <h4><%= current_user.posts.count %></h4>
+        <small class="text-muted">Posts</small>
+      </div>
+
+      <div class="col">
+        <h4><%= current_user.followers.count %></h4>
+        <small class="text-muted">Followers</small>
+      </div>
+
+      <div class="col">
+        <h4><%= current_user.following.count %></h4>
+        <small class="text-muted">Following</small>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <% if @profile.avatar.attached? %>
+      <%= image_tag @profile.avatar,
+                    class: "rounded-circle",
+                    width: 150,
+                    height: 150 %>
+    <% else %>
+      <%= image_tag "default_avatar.png",
+                    class: "rounded-circle",
+                    width: 150,
+                    height: 150 %>
+    <% end %>
+
     <p>
       <strong>Username:</strong>
       <%= @profile.username %>

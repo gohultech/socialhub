@@ -1,0 +1,40 @@
+<div class="container mt-5">
+
+  <h2 class="mb-4">Saved Posts</h2>
+
+  <% if @posts.any? %>
+
+    <% @posts.each do |post| %>
+
+      <div class="card mb-3">
+
+        <div class="card-body">
+
+          <strong>
+            <%= post.user.profile&.username || post.user.email.split("@").first %>
+          </strong>
+
+          <p class="mt-2">
+            <%= post.content %>
+          </p>
+
+          <% if post.image.attached? %>
+            <%= image_tag post.image,
+                          class: "img-fluid rounded" %>
+          <% end %>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  <% else %>
+
+    <div class="alert alert-info">
+      No saved posts.
+    </div>
+
+  <% end %>
+
+</div>

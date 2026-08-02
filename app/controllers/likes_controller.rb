@@ -5,6 +5,13 @@ class LikesController < ApplicationController
     @post = Post.find(params[:post_id])
     current_user.likes.find_or_create_by(post: @post)
 
+    Notification.create(
+      recipient: @post.user,
+      actor: current_user,
+      action: "liked",
+      notifiable: @post
+    ) unless @post.user == current_user
+
     redirect_back fallback_location: root_path
   end
 
