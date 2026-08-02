@@ -1,0 +1,19 @@
+<div class="container mt-5">
+
+  <div class="card shadow p-4">
+
+    <h2>Edit Comment</h2>
+
+    <%= form_with model: [@post, @comment], local: true do |f| %>
+
+      <div class="mb-3">
+        <%= f.text_area :content, class: "form-control", rows: 3 %>
+      </div>
+
+      <%= f.submit "Update Comment", class: "btn btn-primary" %>
+
+    <% end %>
+
+  </div>
+
+</div>

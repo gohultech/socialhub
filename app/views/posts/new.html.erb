@@ -27,6 +27,12 @@
                               placeholder: "What's on your mind?" %>
             </div>
 
+            <div class="mb-3">
+              <%= f.label :image, class: "form-label" %>
+              <%= f.file_field :image, class: "form-control" %>
+            </div>
+
+
             <%= f.submit "Post", class: "btn btn-primary w-100" %>
 
           <% end %>

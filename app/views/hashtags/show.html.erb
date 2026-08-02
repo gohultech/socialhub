@@ -1,0 +1,48 @@
+<div class="container mt-5">
+
+  <h2 class="mb-4">
+    Posts with #<%= @hashtag %>
+  </h2>
+
+  <% if @posts.any? %>
+
+    <% @posts.each do |post| %>
+
+      <div class="card mb-3">
+
+        <div class="card-body">
+
+          <h6 class="fw-bold text-primary">
+            <%= post.user.profile&.username || post.user.email.split("@").first %>
+          </h6>
+
+          <p>
+            <%= render_hashtags(post.content) %>
+          </p>
+
+          <% if post.image.attached? %>
+
+            <%= image_tag post.image,
+                          class: "img-fluid rounded mb-3" %>
+
+          <% end %>
+
+          <small class="text-muted">
+            <%= time_ago_in_words(post.created_at) %> ago
+          </small>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  <% else %>
+
+    <div class="alert alert-info">
+      No posts found for this hashtag.
+    </div>
+
+  <% end %>
+
+</div>
