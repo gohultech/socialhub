@@ -1,45 +1,108 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
+<div class="create-post-page">
+  <%= render "shared/authenticated_topbar", active_section: :create %>
+  <%= render "shared/authenticated_sidebar", active_section: :create %>
 
-      <div class="card shadow-sm">
-        <div class="card-body">
+  <main class="create-post-layout">
+    <div class="create-post-main">
+      <header class="create-post-hero">
+        <div class="create-post-hero-orb create-post-hero-orb-one" aria-hidden="true"></div>
+        <div class="create-post-hero-orb create-post-hero-orb-two" aria-hidden="true"></div>
+        <div class="create-post-hero-icon" aria-hidden="true"><i class="bi bi-pencil-square"></i></div>
+        <div>
+          <p class="create-post-eyebrow">Create something meaningful</p>
+          <h1>Share Your Story</h1>
+          <p>Post your thoughts, ideas, photos, or moments with the CircleHub community.</p>
+        </div>
+      </header>
 
-          <h2 class="mb-4 text-center">Create New Post</h2>
-
-          <%= form_with model: @post, local: true do |f| %>
-
-            <% if @post.errors.any? %>
-              <div class="alert alert-danger">
-                <ul class="mb-0">
-                  <% @post.errors.full_messages.each do |message| %>
-                    <li><%= message %></li>
-                  <% end %>
-                </ul>
-              </div>
+      <section class="create-post-composer" aria-labelledby="create-post-heading">
+        <div class="create-post-composer-heading">
+          <div class="create-post-user">
+            <% if current_user.profile&.avatar&.attached? %>
+              <%= image_tag current_user.profile.avatar, class: "create-post-avatar", alt: "Your avatar" %>
+            <% else %>
+              <span class="create-post-avatar create-post-avatar-placeholder" aria-hidden="true"><i class="bi bi-person-fill"></i></span>
             <% end %>
-
-            <div class="mb-3">
-              <%= f.label :content, class: "form-label" %>
-              <%= f.text_area :content,
-                              rows: 6,
-                              class: "form-control",
-                              placeholder: "What's on your mind?" %>
+            <div>
+              <h2 id="create-post-heading"><%= current_user.profile&.username || current_user.email.split("@").first %></h2>
+              <p><i class="bi bi-globe2" aria-hidden="true"></i> Share with your community</p>
             </div>
+          </div>
+          <span class="create-post-status"><i class="bi bi-stars" aria-hidden="true"></i> New post</span>
+        </div>
 
-            <div class="mb-3">
-              <%= f.label :image, class: "form-label" %>
-              <%= f.file_field :image, class: "form-control" %>
+        <%= form_with model: @post, local: true, class: "create-post-form" do |f| %>
+          <% if @post.errors.any? %>
+            <div class="create-post-errors" role="alert">
+              <div class="create-post-errors-title"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><strong>Please fix the following errors:</strong></div>
+              <ul>
+                <% @post.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
             </div>
-
-
-            <%= f.submit "Post", class: "btn btn-primary w-100" %>
-
           <% end %>
 
-        </div>
-      </div>
+          <div class="create-post-field">
+            <%= f.label :content, "What's on your mind?", class: "create-post-label" %>
+            <%= f.text_area :content, rows: 7, class: "create-post-textarea", placeholder: "Share your thoughts, ideas, or something interesting..." %>
+            <p class="create-post-hint"><i class="bi bi-hash" aria-hidden="true"></i> You can use hashtags and mentions in your post.</p>
+          </div>
 
+          <div class="create-post-actions" aria-label="Post options">
+            <span><i class="bi bi-image" aria-hidden="true"></i> Add photo</span>
+            <span><i class="bi bi-hash" aria-hidden="true"></i> Hashtags &amp; mentions</span>
+          </div>
+
+          <div class="create-post-upload">
+            <%= f.label :image, class: "create-post-upload-zone" do %>
+              <span class="create-post-upload-icon" aria-hidden="true"><i class="bi bi-cloud-arrow-up"></i></span>
+              <strong>Upload an image</strong>
+              <small>Choose an image to share with your post.</small>
+              <span class="create-post-upload-button">Browse files</span>
+              <%= f.file_field :image, class: "create-post-file-input", accept: "image/*" %>
+            <% end %>
+          </div>
+
+          <div class="create-post-submit-row">
+            <%= link_to posts_path, class: "create-post-cancel" do %><i class="bi bi-x-circle" aria-hidden="true"></i> Cancel<% end %>
+            <%= f.submit "Publish Post", class: "create-post-submit" %>
+          </div>
+        <% end %>
+      </section>
+
+      <p class="create-post-footer-note"><i class="bi bi-shield-check" aria-hidden="true"></i> Share responsibly and keep the community positive.</p>
     </div>
-  </div>
+
+    <aside class="create-post-rail" aria-label="Posting guidance">
+      <section class="create-post-rail-card">
+        <p class="create-post-eyebrow">Find your angle</p>
+        <h2>Post Ideas</h2>
+        <p class="create-post-rail-copy">Get inspired by what others are sharing.</p>
+        <ul class="create-post-ideas">
+          <li><i class="bi bi-lightbulb" aria-hidden="true"></i><span>Share a project you're working on</span></li>
+          <li><i class="bi bi-chat-square-text" aria-hidden="true"></i><span>Ask a question to the community</span></li>
+          <li><i class="bi bi-book" aria-hidden="true"></i><span>Share a learning resource</span></li>
+          <li><i class="bi bi-camera" aria-hidden="true"></i><span>Showcase a photo or moment</span></li>
+          <li><i class="bi bi-people" aria-hidden="true"></i><span>Start a discussion</span></li>
+        </ul>
+      </section>
+
+      <section class="create-post-rail-card create-post-guidelines">
+        <div class="create-post-rail-title"><span class="create-post-small-icon" aria-hidden="true"><i class="bi bi-heart-fill"></i></span><h2>Community guidelines</h2></div>
+        <ul>
+          <li>Be respectful and kind</li>
+          <li>No spam or self-promotion</li>
+          <li>Share original content</li>
+          <li>Follow community rules</li>
+        </ul>
+      </section>
+
+      <section class="create-post-cta">
+        <span class="create-post-small-icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
+        <h2>Your voice matters.</h2>
+        <p>Share your ideas, experiences, and moments with a community that cares.</p>
+      </section>
+    </aside>
+  </main>
 </div>

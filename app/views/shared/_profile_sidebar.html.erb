@@ -1,0 +1,26 @@
+<% active_section = local_assigns.fetch(:active_section, :profile) %>
+
+<aside class="profile-sidebar" aria-label="Primary navigation">
+  <%= link_to root_path, class: "profile-sidebar-brand" do %><span class="profile-sidebar-brand-mark"><i class="bi bi-people-fill"></i></span><span>CircleHub</span><% end %>
+
+  <nav class="profile-sidebar-nav">
+    <%= link_to root_path, class: "profile-sidebar-link" do %><i class="bi bi-house-door"></i><span>Home</span><% end %>
+    <%= link_to search_path, class: "profile-sidebar-link" do %><i class="bi bi-search"></i><span>Search</span><% end %>
+    <%= link_to root_path(anchor: "explore"), class: "profile-sidebar-link" do %><i class="bi bi-compass"></i><span>Explore</span><% end %>
+    <%= link_to messages_path, class: "profile-sidebar-link #{'is-active' if active_section == :messages}" do %><i class="bi bi-send"></i><span>Messages</span><% end %>
+    <%= link_to notifications_path, class: "profile-sidebar-link #{'is-active' if active_section == :notifications}" do %><i class="bi bi-heart"></i><span>Notifications</span><% end %>
+    <%= link_to new_post_path, class: "profile-sidebar-link" do %><i class="bi bi-plus-square"></i><span>Create</span><% end %>
+    <%= link_to profile_path(anchor: "profile-saved"), class: "profile-sidebar-link" do %><i class="bi bi-bookmark"></i><span>Saved</span><% end %>
+    <%= link_to profile_path, class: "profile-sidebar-link #{'is-active' if active_section == :profile}" do %><i class="bi bi-person-circle"></i><span>Profile</span><% end %>
+  </nav>
+
+  <%= button_to destroy_user_session_path, method: :delete, class: "profile-sidebar-logout" do %><i class="bi bi-box-arrow-right"></i><span>Logout</span><% end %>
+</aside>
+
+<nav class="profile-mobile-nav" aria-label="Mobile navigation">
+  <%= link_to root_path, aria: { label: "Home" } do %><i class="bi bi-house-door"></i><% end %>
+  <%= link_to search_path, aria: { label: "Search" } do %><i class="bi bi-search"></i><% end %>
+  <%= link_to new_post_path, aria: { label: "Create a post" } do %><i class="bi bi-plus-square"></i><% end %>
+  <%= link_to notifications_path, aria: { label: "Notifications" }, class: ("is-active" if active_section == :notifications) do %><i class="bi bi-heart"></i><% end %>
+  <%= link_to profile_path, aria: { label: "Profile" }, class: ("is-active" if active_section == :profile) do %><i class="bi bi-person-circle"></i><% end %>
+</nav>

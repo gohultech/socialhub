@@ -2,7 +2,7 @@ class SavedPostsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @posts = current_user.saved.order(created_at: :desc)
+    redirect_to profile_path(anchor: "profile-saved")
   end
 
   def create

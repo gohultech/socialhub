@@ -1,5 +1,23 @@
-<p>Welcome <%= @email %>!</p>
+<div style="max-width: 600px; margin: 0 auto; padding: 32px 24px; background: #f8f9fa; font-family: Arial, Helvetica, sans-serif; color: #1f2937;">
+  <div style="background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);">
+    <div style="padding: 28px 32px; background: linear-gradient(135deg, #0d6efd, #5b3cc4); color: #ffffff;">
+      <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.4px;">CircleHub</div>
+      <div style="margin-top: 6px; font-size: 14px; opacity: 0.9;">Connect. Share. Belong.</div>
+    </div>
 
-<p>You can confirm your account email through the link below:</p>
+    <div style="padding: 32px;">
+      <h1 style="margin: 0 0 16px; font-size: 26px; line-height: 1.25; color: #1f2937;">Welcome to CircleHub</h1>
+      <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6;">Thanks for creating a CircleHub account with <strong><%= @email %></strong>. Please confirm that you own this email address to activate your account.</p>
+      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6;">This confirmation link is valid for 3 days.</p>
 
-<p><%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token) %></p>
+      <div style="margin: 0 0 28px; text-align: center;">
+        <%= link_to "Confirm your email", user_confirmation_url(confirmation_token: @token), style: "display: inline-block; padding: 14px 24px; background: #0d6efd; border-radius: 999px; color: #ffffff; font-size: 16px; font-weight: 700; text-decoration: none;" %>
+      </div>
+
+      <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: #4b5563;">If the button does not work, copy and paste this link into your browser:</p>
+      <p style="margin: 0 0 24px; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere;"><%= link_to user_confirmation_url(confirmation_token: @token), user_confirmation_url(confirmation_token: @token), style: "color: #0d6efd;" %></p>
+
+      <p style="margin: 0; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 14px; line-height: 1.6; color: #6b7280;">If you did not create a CircleHub account, you can safely ignore this email. No account will be activated without confirmation.</p>
+    </div>
+  </div>
+</div>

@@ -1,16 +1,62 @@
-<h2>Forgot your password?</h2>
+<div class="auth-page auth-password-reset-premium">
+  <div class="auth-password-reset-noise"></div>
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+  <div class="auth-login-topbar auth-password-reset-topbar">
+    <%= link_to root_path, class: "auth-login-brand", aria: { label: "CircleHub home" } do %>
+      <span class="auth-login-logo"><i class="bi bi-people-fill"></i></span>
+      <span>Circle<span>Hub</span></span>
+    <% end %>
+    <div class="auth-login-signup"><span>Remember your password?</span><%= link_to "Log in", new_user_session_path, class: "auth-login-top-link" %></div>
   </div>
 
-  <div class="actions">
-    <%= f.submit "Send me password reset instructions" %>
-  </div>
-<% end %>
+  <div class="auth-password-reset-layout">
+    <section class="auth-password-reset-intro" aria-labelledby="auth-password-reset-heading">
+      <div class="auth-password-reset-copy">
+        <div class="auth-password-reset-eyebrow"><span>🔒</span> We've got you covered</div>
+        <h1 id="auth-password-reset-heading">Get back to<br>your <span>circle.</span></h1>
+        <h2>We'll help you reconnect.</h2>
+        <p>Enter your email address and we'll send you reset instructions to get you back to what matters — your community.</p>
+      </div>
 
-<%= render "devise/shared/links" %>
+      <div class="auth-password-reset-benefits">
+        <% [["bi-envelope", "Quick & secure", "Get reset instructions instantly", "reset-blue"], ["bi-shield-check", "Your account, protected", "We keep your information safe", "reset-violet"], ["bi-people", "Back to your community", "Rejoin the conversations you love", "reset-cyan"], ["bi-heart", "Stronger together", "Because you belong here", "reset-pink"]].each do |icon, title, description, accent| %>
+          <div class="auth-password-reset-benefit"><span class="auth-password-reset-benefit-icon <%= accent %>"><i class="bi <%= icon %>"></i></span><div><h2><%= title %></h2><p><%= description %></p></div></div>
+        <% end %>
+      </div>
+
+      <div class="auth-password-reset-visual" aria-hidden="true">
+        <div class="auth-password-reset-glow reset-glow-one"></div><div class="auth-password-reset-glow reset-glow-two"></div>
+        <div class="auth-password-reset-community-card"><div class="auth-password-reset-community-image"><span class="reset-sun"></span><span class="reset-hill reset-hill-one"></span><span class="reset-hill reset-hill-two"></span><span class="auth-password-reset-location"><i class="bi bi-arrow-repeat"></i> Reconnect</span></div><div class="auth-password-reset-community-copy"><span>Welcome back to your circle</span><strong>Reset. Rejoin.<br>Keep growing. <b>♥</b></strong></div></div>
+        <div class="auth-password-reset-float reset-float-circle"><i class="bi bi-arrow-up-right"></i><span>Your circle<br>is waiting</span></div><div class="auth-password-reset-float reset-float-real"><i class="bi bi-chat-heart"></i><span>Real people.<br>Real connections.</span></div>
+        <div class="auth-password-reset-avatar reset-avatar-one">A</div><div class="auth-password-reset-avatar reset-avatar-two">M</div><div class="auth-password-reset-avatar reset-avatar-three">S</div>
+      </div>
+      <p class="auth-password-reset-proof"><span class="auth-password-reset-proof-count">50K+</span><span>Real people, real connections.</span></p>
+    </section>
+
+    <section class="auth-password-reset-panel" aria-labelledby="auth-password-reset-form-heading">
+      <div class="auth-password-reset-card">
+        <div class="auth-password-reset-card-heading"><span class="auth-password-reset-card-icon"><i class="bi bi-arrow-repeat"></i></span><div><h2 id="auth-password-reset-form-heading">Forgot your password?</h2><p>No worries. We'll help you reset it.</p></div></div>
+
+        <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: "auth-password-reset-form" }) do |f| %>
+          <%= render "devise/shared/error_messages", resource: resource %>
+
+          <% email_has_error = resource.errors[:email].present? %>
+          <div class="auth-password-reset-field">
+            <%= f.label :email, "Email address" %>
+            <div class="auth-password-reset-input-wrap"><i class="bi bi-envelope"></i><%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control auth-input #{'auth-input-error' if email_has_error}", placeholder: "Enter your email address", aria: (email_has_error ? { invalid: true, describedby: "user_email_error" } : {}) %></div>
+            <%= render "devise/shared/field_error", resource: resource, field: :email, input_id: "user_email" %>
+          </div>
+
+          <%= f.submit "Send reset instructions  →", class: "auth-submit" %>
+        <% end %>
+
+        <div class="auth-password-reset-divider"><span></span><small>OR</small><span></span></div>
+        <%= link_to new_user_session_path, class: "auth-password-reset-back" do %><i class="bi bi-arrow-left"></i> Back to Login<% end %>
+        <div class="auth-password-reset-account"><span>Don't have an account?</span><%= link_to "Create one", new_user_registration_path %></div>
+      </div>
+      <p class="auth-password-reset-security"><i class="bi bi-shield-check"></i> Your privacy and security matter to us.</p>
+    </section>
+  </div>
+
+  <footer class="auth-password-reset-footer"><span>© 2026 CircleHub. All rights reserved.</span><span>A place to connect, discover, and belong. <i class="bi bi-heart-fill"></i></span></footer>
+</div>

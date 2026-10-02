@@ -1,6 +1,9 @@
-<div class="container mt-5">
+<div class="simple-dashboard-page">
+  <%= render "shared/authenticated_topbar", active_section: :home %>
+  <%= render "shared/authenticated_sidebar", active_section: :home %>
 
-  <div class="card shadow p-4">
+  <main class="simple-dashboard-main">
+    <div class="simple-dashboard-card">
 
     <h2>Edit Comment</h2>
 
@@ -14,6 +17,7 @@
 
     <% end %>
 
-  </div>
+    </div>
+  </main>
 
 </div>

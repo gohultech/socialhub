@@ -1,0 +1,109 @@
+html { box-sizing: border-box; max-width: 100%; overflow-x: clip; }
+*, *::before, *::after { box-sizing: inherit; }
+body { max-width: 100%; overflow-x: clip; }
+img, svg, video, canvas { max-width: 100%; }
+button, input, textarea, select { max-width: 100%; }
+input, textarea, select { min-width: 0; }
+
+@media (max-width: 900px) {
+  .home-feed-topbar { gap: 16px; }
+  .home-feed-topbar-brand { min-width: auto; }
+  .home-feed-search { min-width: 0; max-width: none; flex: 1; }
+  .home-feed-topbar-profile { display: none; }
+  .home-feed-topbar-actions { gap: 3px; }
+  .home-feed-topbar-icon, .home-feed-topbar-logout { width: 34px; height: 34px; }
+
+  .home-feed-mobile-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 50; display: flex; align-items: center; justify-content: space-around; height: 58px; border-top: 1px solid rgba(148, 163, 184, .14); background: rgba(5, 9, 18, .94); box-shadow: 0 -12px 30px rgba(0, 0, 0, .2); backdrop-filter: blur(16px); }
+  .home-feed-mobile-nav a { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 11px; color: #94a3b8; font-size: 19px; text-decoration: none; }
+  .home-feed-mobile-nav a:hover, .home-feed-mobile-nav a.is-active { background: rgba(59, 130, 246, .14); color: #82adff; }
+
+  .home-feed-page, .messages-page, .search-page, .notifications-page, .create-post-page, .profile-dashboard-page, .edit-profile-page { min-width: 0; }
+}
+
+@media (max-width: 480px) {
+  .home-feed-topbar { gap: 8px; }
+  .home-feed-topbar-brand { flex: 0 0 auto; font-size: 17px; }
+  .home-feed-topbar-brand .home-feed-brand-mark { width: 31px; height: 31px; }
+  .home-feed-search { padding: 0 10px; }
+  .home-feed-search input { font-size: 12px; }
+  .home-feed-topbar-icon, .home-feed-topbar-logout { width: 31px; height: 31px; font-size: 15px; }
+  .home-feed-topbar-actions { flex: 0 0 auto; }
+}
+
+/* Legacy authenticated views use the same dashboard frame without changing
+   their existing forms, links, or post actions. */
+.posts-index-page, .simple-dashboard-page, .user-profile-page {
+  display: grid;
+  grid-template-areas: "top top" "side main";
+  grid-template-columns: 220px minmax(0, 1088px);
+  gap: 28px;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  justify-content: center;
+  padding: 0 32px 42px;
+  overflow: hidden;
+  background: #050912;
+  color: #f8fafc;
+}
+.posts-index-page > .home-feed-topbar, .simple-dashboard-page > .home-feed-topbar, .user-profile-page > .home-feed-topbar { grid-area: top; }
+.posts-index-page > .home-feed-sidebar, .simple-dashboard-page > .home-feed-sidebar, .user-profile-page > .home-feed-sidebar { grid-area: side; }
+.posts-index-main, .simple-dashboard-main, .user-profile-page > .profile-content { grid-area: main; min-width: 0; }
+.posts-index-main > section { padding-top: 34px !important; padding-bottom: 0 !important; }
+.posts-index-page .container { width: 100%; max-width: none; padding: 0; }
+.posts-index-page .card, .posts-index-page .bg-light { border-color: rgba(148, 163, 184, .14) !important; background: linear-gradient(145deg, rgba(16, 28, 48, .96), rgba(8, 17, 31, .94)) !important; color: #f8fafc; }
+.posts-index-page .text-dark, .posts-index-page .text-muted { color: #cbd5e1 !important; }
+.posts-index-page h1, .posts-index-page h5, .posts-index-page h6 { color: #f8fafc !important; }
+.posts-index-page .border-top { border-color: rgba(148, 163, 184, .14) !important; }
+.posts-index-page img { max-height: 620px; object-fit: cover; }
+.posts-index-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.posts-index-page .row { --bs-gutter-x: 0; }
+.simple-dashboard-main { width: 100%; max-width: 760px; justify-self: center; padding-top: 42px; }
+.simple-dashboard-card { padding: 28px; border: 1px solid rgba(148, 163, 184, .14); border-radius: 20px; background: linear-gradient(145deg, rgba(16, 28, 48, .96), rgba(8, 17, 31, .94)); box-shadow: 0 20px 48px rgba(0, 0, 0, .18); }
+.simple-dashboard-card h2, .simple-dashboard-card label { color: #f8fafc; }
+.simple-dashboard-card input, .simple-dashboard-card textarea { width: 100%; max-width: 100%; border-color: rgba(148, 163, 184, .18); background: rgba(5, 9, 18, .62); color: #f8fafc; }
+.simple-dashboard-card input:focus, .simple-dashboard-card textarea:focus { border-color: #60a5fa; background: rgba(7, 14, 27, .85); color: #f8fafc; box-shadow: 0 0 0 3px rgba(59, 130, 246, .1); }
+.hashtag-public-page { width: min(100% - 32px, 760px); margin: 0 auto; padding: 42px 0; }
+.hashtag-page .simple-dashboard-main { max-width: none; padding-top: 42px; }
+.hashtag-page .simple-dashboard-card h2 { margin-bottom: 24px; }
+.hashtag-page .card { border-color: rgba(148, 163, 184, .14); background: linear-gradient(145deg, rgba(16, 28, 48, .96), rgba(8, 17, 31, .94)); color: #f8fafc; }
+.hashtag-page .text-muted { color: #94a3b8 !important; }
+.hashtag-page .text-primary { color: #8fb5ff !important; }
+.hashtag-page img { max-height: 620px; object-fit: cover; }
+.user-profile-page .profile-content { width: min(100%, 935px); margin: 0 auto; padding-top: 24px; }
+
+@media (max-width: 1240px) {
+  .posts-index-page, .simple-dashboard-page, .user-profile-page { grid-template-columns: 200px minmax(0, 720px); gap: 24px; }
+}
+
+@media (max-width: 900px) {
+  .posts-index-page, .simple-dashboard-page, .user-profile-page { grid-template-areas: "top" "main"; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0 20px 78px; }
+  .posts-index-page > .home-feed-sidebar, .simple-dashboard-page > .home-feed-sidebar, .user-profile-page > .home-feed-sidebar { display: none; }
+  .posts-index-main > section { padding-top: 24px !important; }
+  .simple-dashboard-main, .user-profile-page > .profile-content { max-width: none; padding-top: 24px; }
+}
+
+@media (max-width: 620px) {
+  .posts-index-page, .simple-dashboard-page, .user-profile-page { padding: 0 0 72px; }
+  .posts-index-main > section { padding: 20px 14px 0 !important; }
+  .posts-index-page .card { border-right: 0 !important; border-left: 0 !important; border-radius: 0 !important; }
+  .posts-index-page .d-flex.justify-content-between { align-items: flex-start; flex-wrap: wrap; }
+  .simple-dashboard-main, .user-profile-page > .profile-content { padding-top: 14px; }
+  .simple-dashboard-card { border-right: 0; border-left: 0; border-radius: 0; padding: 20px 16px; }
+  .hashtag-public-page { width: calc(100% - 28px); padding: 24px 0; }
+}
+
+/* Devise fallback screens that still use the framework's simple field markup. */
+body:has(main .field) { background: #050912; color: #f8fafc; }
+body:has(main .field) main { min-height: 100vh; padding: 42px 16px; }
+body:has(main .field) main > h2, body:has(main .field) main > form, body:has(main .field) main > .alert { width: min(100%, 520px); margin-right: auto; margin-left: auto; }
+body:has(main .field) main > h2 { margin-bottom: 24px; color: #f8fafc; }
+body:has(main .field) main > form { padding: 24px; border: 1px solid rgba(148, 163, 184, .14); border-radius: 18px; background: linear-gradient(145deg, rgba(16, 28, 48, .96), rgba(8, 17, 31, .94)); box-shadow: 0 20px 48px rgba(0, 0, 0, .18); }
+body:has(main .field) main > form input, body:has(main .field) main > form textarea { width: 100%; max-width: 100%; box-sizing: border-box; border: 1px solid rgba(148, 163, 184, .18); border-radius: 10px; background: rgba(5, 9, 18, .62); color: #f8fafc; }
+body:has(main .field) main > form input:focus, body:has(main .field) main > form textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(59, 130, 246, .1); }
+body:has(main .field) main > form input[type="submit"] { min-height: 42px; border: 0; background: linear-gradient(135deg, #3b82f6, #7c3aed); color: #fff; cursor: pointer; }
+
+@media (max-width: 480px) {
+  body:has(main .field) main { padding: 28px 14px; }
+  body:has(main .field) main > form { padding: 18px; }
+}

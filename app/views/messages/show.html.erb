@@ -1,0 +1,109 @@
+<% username = @user.profile&.username || @user.email.split("@").first %>
+
+<div class="messages-page messages-page-chat">
+  <%= render "shared/authenticated_topbar", active_section: :messages %>
+  <%= render "shared/authenticated_sidebar", active_section: :messages %>
+
+  <main class="messages-layout messages-layout-chat">
+    <aside class="messages-inbox messages-active-inbox" aria-label="Conversations">
+      <header class="messages-inbox-header">
+        <div>
+          <span class="messages-eyebrow">Private space</span>
+          <h1>Messages</h1>
+        </div>
+        <%= link_to messages_path, class: "messages-inbox-link" do %>Inbox<% end %>
+      </header>
+
+      <div class="messages-inbox-tools">
+        <label class="messages-search" for="active-conversation-search">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input id="active-conversation-search" type="search" placeholder="Search messages..." autocomplete="off">
+        </label>
+      </div>
+
+      <div class="messages-list">
+        <div class="messages-list-label"><span>Current conversation</span><span>1</span></div>
+        <%= link_to message_path(@user), class: "messages-conversation is-active" do %>
+          <% if @user.profile&.avatar&.attached? %>
+            <%= image_tag @user.profile.avatar, class: "messages-avatar", alt: "#{username}'s avatar" %>
+          <% else %>
+            <%= image_tag "default_avatar.png", class: "messages-avatar", alt: "Default avatar" %>
+          <% end %>
+          <span class="messages-conversation-copy"><strong><%= username %></strong><small>CircleHub member</small></span>
+          <i class="bi bi-chevron-right messages-conversation-chevron" aria-hidden="true"></i>
+        <% end %>
+      </div>
+    </aside>
+
+    <section class="messages-chat-panel" aria-label="Conversation with <%= username %>">
+      <header class="messages-chat-header">
+        <%= link_to messages_path, class: "messages-chat-back", aria: { label: "Back to messages" } do %><i class="bi bi-arrow-left"></i><% end %>
+        <% if @user.profile&.avatar&.attached? %>
+          <%= image_tag @user.profile.avatar, class: "messages-avatar messages-header-avatar", alt: "#{username}'s avatar" %>
+        <% else %>
+          <%= image_tag "default_avatar.png", class: "messages-avatar messages-header-avatar", alt: "Default avatar" %>
+        <% end %>
+        <div class="messages-chat-header-copy"><strong><%= username %></strong><small>CircleHub member</small></div>
+        <div class="messages-chat-header-actions">
+          <%= link_to user_path(@user), class: "messages-header-action", aria: { label: "View profile" } do %><i class="bi bi-person"></i><% end %>
+        </div>
+      </header>
+
+      <div id="chat-box" class="messages-chat-box" data-current-user-id="<%= current_user.id %>">
+        <% if @messages.any? %>
+          <div class="messages-date-separator"><span>Conversation</span></div>
+          <% @messages.each do |message| %>
+            <% if message.sender == current_user %>
+              <div class="messages-bubble-row is-sent">
+                <div><p class="messages-bubble"><%= message.content %></p><time><%= message.created_at.strftime("%I:%M %p") %><i class="bi bi-check2-all"></i></time></div>
+              </div>
+            <% else %>
+              <div class="messages-bubble-row is-received">
+                <div><p class="messages-bubble"><%= message.content %></p><time><%= message.created_at.strftime("%I:%M %p") %></time></div>
+              </div>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="messages-chat-empty">
+            <span class="messages-empty-icon"><i class="bi bi-chat-heart"></i></span>
+            <h2>Start a conversation</h2>
+            <p>Send a message and start chatting with <strong><%= username %></strong>.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <footer class="messages-compose">
+        <%= form_with model: @message, local: true do |f| %>
+          <%= f.hidden_field :receiver_id, value: @user.id %>
+          <div class="messages-compose-input">
+            <span class="messages-compose-leading" aria-hidden="true"><i class="bi bi-chat-text"></i></span>
+            <%= f.text_field :content, placeholder: "Write a message...", autocomplete: "off", aria: { label: "Message" } %>
+            <%= f.submit "Send" %>
+          </div>
+        <% end %>
+      </footer>
+    </section>
+
+    <aside class="messages-details" aria-label="Conversation details">
+      <div class="messages-details-card messages-details-profile">
+        <div class="messages-details-cover"><span></span><span></span></div>
+        <div class="messages-details-avatar-wrap">
+          <% if @user.profile&.avatar&.attached? %>
+            <%= image_tag @user.profile.avatar, class: "messages-details-avatar", alt: "#{username}'s avatar" %>
+          <% else %>
+            <%= image_tag "default_avatar.png", class: "messages-details-avatar", alt: "Default avatar" %>
+          <% end %>
+        </div>
+        <h2><%= username %></h2>
+        <p>CircleHub member</p>
+        <% if @user.profile&.bio.present? %><div class="messages-details-bio"><%= @user.profile.bio %></div><% end %>
+        <%= link_to user_path(@user), class: "messages-view-profile" do %>View profile <i class="bi bi-arrow-up-right"></i><% end %>
+      </div>
+
+      <div class="messages-details-card messages-details-note">
+        <span class="messages-details-icon"><i class="bi bi-shield-check"></i></span>
+        <div><strong>Private conversation</strong><p>Your messages are shared only with this person.</p></div>
+      </div>
+    </aside>
+  </main>
+</div>

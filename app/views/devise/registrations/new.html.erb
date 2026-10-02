@@ -1,70 +1,75 @@
-<div class="container">
-  <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="col-md-5">
+<div class="auth-page auth-registration auth-registration-premium">
+  <div class="auth-registration-noise"></div>
 
-      <div class="card shadow border-0 rounded-4">
-        <div class="card-body p-5">
+  <div class="auth-login-topbar auth-registration-topbar">
+    <%= link_to root_path, class: "auth-login-brand", aria: { label: "CircleHub home" } do %>
+      <span class="auth-login-logo"><i class="bi bi-people-fill"></i></span>
+      <span>Circle<span>Hub</span></span>
+    <% end %>
+    <div class="auth-login-signup"><span>Already have an account?</span><%= link_to "Log in", new_user_session_path, class: "auth-login-top-link" %></div>
+  </div>
 
-          <div class="text-center mb-4">
-            <h2 class="fw-bold">Create Account</h2>
-            <p class="text-muted">Join SocialHub and start connecting</p>
-          </div>
-
-          <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-
-            <%= render "devise/shared/error_messages", resource: resource %>
-
-            <div class="mb-3">
-              <%= f.label :email, class: "form-label" %>
-              <%= f.email_field :email,
-                                autofocus: true,
-                                autocomplete: "email",
-                                class: "form-control",
-                                placeholder: "Enter your email" %>
-            </div>
-
-            <div class="mb-3">
-              <%= f.label :password, class: "form-label" %>
-
-              <% if @minimum_password_length %>
-                <small class="text-muted d-block mb-2">
-                  Minimum <%= @minimum_password_length %> characters
-                </small>
-              <% end %>
-
-              <%= f.password_field :password,
-                                   autocomplete: "new-password",
-                                   class: "form-control",
-                                   placeholder: "Create a password" %>
-            </div>
-
-            <div class="mb-4">
-              <%= f.label :password_confirmation, class: "form-label" %>
-              <%= f.password_field :password_confirmation,
-                                   autocomplete: "new-password",
-                                   class: "form-control",
-                                   placeholder: "Confirm your password" %>
-            </div>
-
-            <div class="d-grid">
-              <%= f.submit "Create Account", class: "btn btn-primary btn-lg" %>
-            </div>
-
-          <% end %>
-
-          <div class="text-center mt-4">
-            <p class="mb-1">
-              Already have an account?
-            </p>
-
-            <%= link_to "Log in",
-                        new_user_session_path,
-                        class: "text-decoration-none fw-semibold" %>
-          </div>
-
-        </div>
+  <div class="auth-registration-layout">
+    <section class="auth-registration-intro" aria-labelledby="auth-registration-heading">
+      <div class="auth-registration-copy">
+        <div class="auth-registration-eyebrow"><span>⚡</span> Start your journey today</div>
+        <h1 id="auth-registration-heading">Join <span>CircleHub</span></h1>
+        <h2>Find your people.<br>Build your circle.</h2>
+        <p>Create an account and be part of a growing community where real conversations, ideas, and friendships happen.</p>
       </div>
 
-    </div>
+      <div class="auth-registration-benefits">
+        <% [["01", "bi-people", "Meet amazing people", "Connect with like-minded individuals", "registration-blue"], ["02", "bi-chat-heart", "Share your thoughts", "Start meaningful conversations", "registration-violet"], ["03", "bi-compass", "Explore communities", "Find spaces for your interests", "registration-cyan"], ["04", "bi-shield-check", "A safer, kinder space", "Respect, privacy, and positivity", "registration-pink"]].each do |number, icon, title, description, accent| %>
+          <div class="auth-registration-benefit"><span class="auth-registration-number"><%= number %></span><span class="auth-registration-benefit-icon <%= accent %>"><i class="bi <%= icon %>"></i></span><div><h2><%= title %></h2><p><%= description %></p></div></div>
+        <% end %>
+      </div>
+
+      <div class="auth-registration-visual" aria-hidden="true">
+        <div class="auth-registration-visual-glow registration-glow-one"></div><div class="auth-registration-visual-glow registration-glow-two"></div>
+        <div class="auth-registration-community-card"><div class="auth-registration-community-image"><span class="registration-sun"></span><span class="registration-hill registration-hill-one"></span><span class="registration-hill registration-hill-two"></span><span class="auth-registration-location"><i class="bi bi-compass"></i> Find your people</span></div><div class="auth-registration-community-copy"><span>CircleHub community</span><strong>A stronger community<br>together. <b>♥</b></strong></div></div>
+        <div class="auth-registration-float registration-float-share"><i class="bi bi-arrow-up-right"></i><span>Explore<br>new horizons</span></div><div class="auth-registration-float registration-float-real"><i class="bi bi-chat-heart"></i><span>Real people.<br>Real conversations.</span></div>
+        <div class="auth-registration-avatar registration-avatar-one">A</div><div class="auth-registration-avatar registration-avatar-two">M</div><div class="auth-registration-avatar registration-avatar-three">S</div>
+      </div>
+      <p class="auth-registration-proof"><span class="auth-registration-proof-stack"><i>A</i><i>M</i><i>S</i><i>+</i></span><span>Join <strong>50,000+ people</strong> already building their circles.</span></p>
+    </section>
+
+    <section class="auth-registration-panel" aria-labelledby="auth-registration-form-heading">
+      <div class="auth-registration-card">
+        <div class="auth-registration-card-heading"><span class="auth-registration-card-icon"><i class="bi bi-people-fill"></i></span><div><h2 id="auth-registration-form-heading">Create an account</h2><p>Sign up to join CircleHub and connect with your community.</p></div></div>
+
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "auth-registration-form" }) do |f| %>
+          <%= render "devise/shared/error_messages", resource: resource %>
+
+          <% email_has_error = resource.errors[:email].present? %>
+          <div class="auth-registration-field">
+            <%= f.label :email, "Email address" %>
+            <div class="auth-registration-input-wrap"><i class="bi bi-envelope"></i><%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control auth-input #{'auth-input-error' if email_has_error}", placeholder: "Enter your email", aria: (email_has_error ? { invalid: true, describedby: "user_email_error" } : {}) %></div>
+            <%= render "devise/shared/field_error", resource: resource, field: :email, input_id: "user_email" %>
+          </div>
+
+          <% password_has_error = resource.errors[:password].present? %>
+          <div class="auth-registration-field">
+            <%= f.label :password, "Password" %>
+            <% if @minimum_password_length %><small class="auth-registration-password-info"><i class="bi bi-info-circle"></i> Minimum <%= @minimum_password_length %> characters</small><% end %>
+            <div class="auth-registration-input-wrap"><i class="bi bi-lock"></i><%= f.password_field :password, autocomplete: "new-password", class: "form-control auth-input #{'auth-input-error' if password_has_error}", placeholder: "Create a password", aria: (password_has_error ? { invalid: true, describedby: "user_password_error" } : {}) %></div>
+            <%= render "devise/shared/field_error", resource: resource, field: :password, input_id: "user_password" %>
+          </div>
+
+          <% confirmation_has_error = resource.errors[:password_confirmation].present? %>
+          <div class="auth-registration-field">
+            <%= f.label :password_confirmation, "Confirm password" %>
+            <div class="auth-registration-input-wrap"><i class="bi bi-lock"></i><%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control auth-input #{'auth-input-error' if confirmation_has_error}", placeholder: "Confirm your password", aria: (confirmation_has_error ? { invalid: true, describedby: "user_password_confirmation_error" } : {}) %></div>
+            <%= render "devise/shared/field_error", resource: resource, field: :password_confirmation, input_id: "user_password_confirmation" %>
+          </div>
+
+          <%= f.submit "Sign up  →", class: "auth-submit" %>
+        <% end %>
+
+        <div class="auth-registration-account"><span>Already have an account?</span><%= link_to "Log in", new_user_session_path %></div>
+      </div>
+      <p class="auth-registration-security"><i class="bi bi-shield-check"></i> Your privacy and security matter to us.</p>
+    </section>
   </div>
+
+  <footer class="auth-registration-footer-premium"><span>© 2026 CircleHub. All rights reserved.</span><span>A place to connect, discover, and belong. <i class="bi bi-heart-fill"></i></span></footer>
 </div>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SocialHub</title>
+  <title>CircleHub</title>
+
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <%= csrf_meta_tags %>
@@ -11,22 +12,35 @@
   <%= javascript_importmap_tags %>
 
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 
-<%= render "shared/navbar" %>
+<% authenticated_shell_page = user_signed_in? && ((controller_name == "home" && action_name == "index") || controller_name == "messages" || controller_name == "search" || controller_name == "notifications" || (controller_name == "posts" && ["index", "new", "edit"].include?(action_name)) || (controller_name == "profiles" && ["show", "edit"].include?(action_name)) || (controller_name == "users" && action_name == "show") || (controller_name == "comments" && action_name == "edit")) %>
+
+<% unless controller_name == "home" && action_name == "index" && !user_signed_in? || authenticated_shell_page %>
+  <%= render "shared/navbar" %>
+<% end %>
 
 <main>
   <%= render "shared/flash" %>
   <%= yield %>
 </main>
 
-<%= render "shared/footer" %>
+<%= render "shared/footer" unless authenticated_shell_page %>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+</script>
 
 </body>
 </html>

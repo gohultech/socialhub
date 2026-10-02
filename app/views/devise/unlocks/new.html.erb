@@ -1,11 +1,14 @@
+<div class="auth-legacy-page">
 <h2>Resend unlock instructions</h2>
 
-<%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f| %>
+<%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post, class: "auth-legacy-form" }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="field">
     <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+    <% email_has_error = resource.errors[:email].present? %>
+    <p><%= f.email_field :email, autofocus: true, autocomplete: "email", class: ("auth-input-error" if email_has_error), aria: (email_has_error ? { invalid: true, describedby: "user_email_error" } : {}) %></p>
+    <%= render "devise/shared/field_error", resource: resource, field: :email, input_id: "user_email" %>
   </div>
 
   <div class="actions">
@@ -14,3 +17,4 @@
 <% end %>
 
 <%= render "devise/shared/links" %>
+</div>

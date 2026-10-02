@@ -1,7 +1,14 @@
 <% flash.each do |type, message| %>
-  <div class="container mt-3">
-    <div class="alert alert-info">
-      <%= message %>
+  <% flash_variant = case type.to_sym
+                     when :notice, :success then "success"
+                     when :alert, :error then "error"
+                     else "info"
+                     end %>
+  <% flash_icon = { "success" => "bi-check-circle-fill", "error" => "bi-exclamation-triangle-fill", "info" => "bi-info-circle-fill" }.fetch(flash_variant) %>
+  <div class="site-flash-container">
+    <div class="auth-flash auth-flash-<%= flash_variant %>" role="status">
+      <i class="bi <%= flash_icon %>" aria-hidden="true"></i>
+      <span><%= message %></span>
     </div>
   </div>
 <% end %>

@@ -1,5 +1,84 @@
-<footer class="bg-dark text-white text-center py-3 mt-5">
+<footer class="social-footer">
+
   <div class="container">
-    © <%= Date.current.year %> SocialHub. All Rights Reserved.
+
+    <div class="row align-items-center gy-3">
+
+      <!-- Brand -->
+
+      <div class="col-md-6">
+
+        <div class="footer-brand">
+
+          <span class="footer-brand-icon">
+            <i class="bi bi-people-fill"></i>
+          </span>
+
+          <span>
+            CircleHub
+          </span>
+
+        </div>
+
+        <p class="footer-tagline mb-0">
+          Connect. Share. Discover.
+        </p>
+
+      </div>
+
+
+      <!-- Links -->
+
+      <div class="col-md-6">
+
+        <div class="footer-links">
+
+          <% if user_signed_in? %>
+
+          <%= link_to "Home", root_path %>
+
+          <%= link_to "Posts", posts_path %>
+
+          <%= link_to "Search", search_path %>
+
+          <%= link_to "Messages", messages_path %>
+
+          <%= link_to "Profile", profile_path %>
+
+          <% else %>
+
+            <span>About</span>
+            <span>Help</span>
+            <span>Privacy</span>
+            <span>Terms</span>
+            <span>Contact</span>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <hr class="footer-divider">
+
+
+    <div class="footer-bottom">
+
+      <span>
+        © <%= Time.current.year %> CircleHub.
+        All Rights Reserved.
+      </span>
+
+      <span>
+        <i class="bi bi-shield-check me-1"></i>
+        Built with care
+      </span>
+
+    </div>
+
   </div>
+
 </footer>

@@ -28,7 +28,8 @@ class ProfilesController < ApplicationController
       :bio,
       :website,
       :location,
-      :avatar
+      :avatar,
+      :cover_photo
     )
   end
 end

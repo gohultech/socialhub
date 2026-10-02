@@ -1,56 +1,80 @@
-<div class="container">
-  <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="col-md-5">
+<div class="auth-page auth-login">
+  <div class="auth-login-noise"></div>
 
-      <div class="card shadow border-0 rounded-4">
-        <div class="card-body p-5">
+  <div class="auth-login-topbar">
+    <%= link_to root_path, class: "auth-login-brand", aria: { label: "CircleHub home" } do %>
+      <span class="auth-login-logo"><i class="bi bi-people-fill"></i></span>
+      <span>Circle<span>Hub</span></span>
+    <% end %>
+    <div class="auth-login-signup"><span>New here?</span><%= link_to "Create account", new_user_registration_path, class: "auth-login-top-link" %></div>
+  </div>
 
-          <div class="text-center mb-4">
-            <h2 class="fw-bold">Welcome Back</h2>
-            <p class="text-muted">Sign in to continue to SocialHub</p>
-          </div>
-
-          <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-
-            <%= render "devise/shared/error_messages", resource: resource %>
-
-            <div class="mb-3">
-              <%= f.label :email, class: "form-label" %>
-              <%= f.email_field :email,
-                                autofocus: true,
-                                autocomplete: "email",
-                                class: "form-control",
-                                placeholder: "Enter your email" %>
-            </div>
-
-            <div class="mb-3">
-              <%= f.label :password, class: "form-label" %>
-              <%= f.password_field :password,
-                                   autocomplete: "current-password",
-                                   class: "form-control",
-                                   placeholder: "Enter your password" %>
-            </div>
-
-            <% if devise_mapping.rememberable? %>
-              <div class="form-check mb-3">
-                <%= f.check_box :remember_me, class: "form-check-input" %>
-                <%= f.label :remember_me, class: "form-check-label" %>
-              </div>
-            <% end %>
-
-            <div class="d-grid">
-              <%= f.submit "Login", class: "btn btn-primary btn-lg" %>
-            </div>
-
-          <% end %>
-
-          <div class="text-center mt-4">
-            <%= render "devise/shared/links" %>
-          </div>
-
-        </div>
+  <div class="auth-login-layout">
+    <section class="auth-login-intro" aria-labelledby="auth-login-heading">
+      <div class="auth-login-copy">
+        <div class="auth-login-eyebrow"><span>⚡</span> More than just a community</div>
+        <h1 id="auth-login-heading">Welcome back<br>to <span>CircleHub</span></h1>
+        <p>Great conversations, amazing people,<br class="auth-login-desktop-break"> and a more connected you. Let's continue<br class="auth-login-desktop-break"> this journey together.</p>
       </div>
 
-    </div>
+      <div class="auth-login-benefits">
+        <% [["bi-people", "Real people", "Connect with like-minded individuals", "benefit-blue"], ["bi-chat-heart", "Meaningful conversations", "Share ideas and perspectives", "benefit-violet"], ["bi-people-fill", "Diverse communities", "Explore topics you love", "benefit-pink"], ["bi-shield-check", "A safe space", "Respect, privacy, and positivity", "benefit-teal"]].each do |icon, title, description, accent| %>
+          <div class="auth-login-benefit"><span class="auth-login-benefit-icon <%= accent %>"><i class="bi <%= icon %>"></i></span><div><h2><%= title %></h2><p><%= description %></p></div></div>
+        <% end %>
+      </div>
+
+      <div class="auth-community-visual" aria-hidden="true">
+        <div class="auth-visual-glow auth-visual-glow-one"></div><div class="auth-visual-glow auth-visual-glow-two"></div>
+        <div class="auth-community-card auth-community-main"><div class="auth-community-image"><span class="auth-community-sun"></span><span class="auth-community-hill hill-one"></span><span class="auth-community-hill hill-two"></span><span class="auth-community-location"><i class="bi bi-geo-alt-fill"></i> Your community</span></div><div class="auth-community-card-copy"><span>Today, in your circle</span><strong>A stronger community<br>together. <b>♥</b></strong></div></div>
+        <div class="auth-community-float auth-community-share"><i class="bi bi-stars"></i><span>Share<br>your journey</span></div>
+        <div class="auth-community-float auth-community-members"><strong>50K+</strong><span>people already<br>connected</span></div>
+        <div class="auth-community-avatar auth-community-avatar-one">A</div><div class="auth-community-avatar auth-community-avatar-two">M</div><div class="auth-community-avatar auth-community-avatar-three">S</div>
+      </div>
+    </section>
+
+    <section class="auth-login-panel" aria-labelledby="auth-login-form-heading">
+      <div class="auth-login-card">
+        <div class="auth-login-card-heading"><span class="auth-login-card-icon"><i class="bi bi-people-fill"></i></span><div><h2 id="auth-login-form-heading">Welcome back</h2><p>Sign in to continue to CircleHub.</p></div></div>
+
+        <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "auth-login-form" }) do |f| %>
+          <%= render "devise/shared/error_messages", resource: resource %>
+
+          <% email_has_error = resource.errors[:email].present? %>
+          <div class="auth-login-field">
+            <%= f.label :email, "Email address" %>
+            <div class="auth-login-input-wrap"><i class="bi bi-envelope"></i><%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control auth-input #{'auth-input-error' if email_has_error}", placeholder: "Enter your email", aria: (email_has_error ? { invalid: true, describedby: "user_email_error" } : {}) %></div>
+            <%= render "devise/shared/field_error", resource: resource, field: :email, input_id: "user_email" %>
+          </div>
+
+          <% password_has_error = resource.errors[:password].present? %>
+          <div class="auth-login-field">
+            <%= f.label :password, "Password" %>
+            <div class="auth-login-input-wrap"><i class="bi bi-lock"></i><%= f.password_field :password, autocomplete: "current-password", class: "form-control auth-input #{'auth-input-error' if password_has_error}", placeholder: "Enter your password", aria: (password_has_error ? { invalid: true, describedby: "user_password_error" } : {}) %></div>
+            <%= render "devise/shared/field_error", resource: resource, field: :password, input_id: "user_password" %>
+          </div>
+
+          <div class="auth-login-options">
+            <% if devise_mapping.rememberable? %>
+              <div class="form-check"><%= f.check_box :remember_me, class: "form-check-input" %><%= f.label :remember_me, "Remember me", class: "form-check-label" %></div>
+            <% end %>
+            <% if devise_mapping.recoverable? && controller_name != "passwords" && controller_name != "registrations" %><%= link_to "Forgot your password?", new_password_path(resource_name), class: "auth-login-secondary-link" %><% end %>
+          </div>
+
+          <%= f.submit "Log in  →", class: "auth-submit" %>
+        <% end %>
+
+        <div class="auth-login-account"><span>Don't have an account?</span><%= link_to "Create account", new_registration_path(resource_name) %></div>
+
+        <% if devise_mapping.confirmable? && controller_name != "confirmations" %>
+          <div class="auth-login-help"><%= link_to "Didn't receive confirmation instructions?", new_user_confirmation_path %></div>
+        <% end %>
+        <% if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != "unlocks" %>
+          <div class="auth-login-help"><%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name) %></div>
+        <% end %>
+      </div>
+      <p class="auth-login-security"><i class="bi bi-shield-check"></i> Your privacy and security matter to us.</p>
+    </section>
   </div>
+
+  <footer class="auth-login-footer"><span>© 2026 CircleHub. All rights reserved.</span><span>A place to connect, discover, and belong. <i class="bi bi-heart-fill"></i></span></footer>
 </div>
