@@ -1,0 +1,260 @@
+/* =========================================
+   SOCIALHUB PREMIUM NAVBAR
+========================================= */
+
+.social-navbar {
+    min-height: 70px;
+
+    background: rgba(25, 29, 32, 0.96);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+    box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.10);
+
+    position: relative;
+    z-index: 1000;
+
+    backdrop-filter: blur(12px);
+
+    transition: all 0.3s ease;
+}
+
+
+/* Brand */
+
+.social-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #fff !important;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition: transform 0.25s ease;
+}
+
+.social-brand:hover {
+    transform: translateY(-1px);
+}
+
+
+/* Brand Icon */
+
+.brand-icon {
+    width: 34px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #0d6efd;
+
+    color: white;
+
+    font-size: 16px;
+
+    box-shadow:
+            0 5px 15px rgba(13, 110, 253, 0.30);
+
+    transition: all 0.25s ease;
+}
+
+.social-brand:hover .brand-icon {
+    transform: rotate(-4deg) scale(1.05);
+
+    box-shadow:
+            0 8px 20px rgba(13, 110, 253, 0.40);
+}
+
+
+/* Navigation Links */
+
+.social-nav-link {
+    position: relative;
+
+    color: rgba(255, 255, 255, 0.68) !important;
+
+    padding: 8px 12px !important;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+    transition:
+            color 0.25s ease,
+            background 0.25s ease,
+            transform 0.25s ease;
+}
+
+.social-nav-link:hover {
+    color: #fff !important;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    transform: translateY(-1px);
+}
+
+
+/* Active underline */
+
+.social-nav-link::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 2px;
+
+    width: 0;
+    height: 2px;
+
+    background: #0d6efd;
+
+    border-radius: 5px;
+
+    transform: translateX(-50%);
+
+    transition: width 0.25s ease;
+}
+
+.social-nav-link:hover::after {
+    width: 22px;
+}
+
+
+/* Login */
+
+.social-login-link {
+    color: rgba(255, 255, 255, 0.75) !important;
+
+    font-weight: 500;
+
+    padding: 8px 14px !important;
+
+    border-radius: 9px;
+
+    transition: all 0.25s ease;
+}
+
+.social-login-link:hover {
+    color: #fff !important;
+
+    background: rgba(255, 255, 255, 0.07);
+}
+
+
+/* Get Started */
+
+.social-get-started {
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 9px 18px;
+
+    background: #0d6efd;
+
+    color: #fff !important;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    box-shadow:
+            0 6px 18px rgba(13, 110, 253, 0.25);
+
+    transition: all 0.25s ease;
+}
+
+.social-get-started:hover {
+    background: #0b5ed7;
+
+    color: white;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 10px 25px rgba(13, 110, 253, 0.35);
+}
+
+
+/* Logout */
+
+.social-navbar .social-logout-btn {
+    /* Bootstrap loads after this stylesheet; override its default dark .btn
+       colors with higher-specificity variables for the dark navbar. */
+    --bs-btn-color: rgba(255, 255, 255, 0.85);
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: rgba(255, 255, 255, 0.25);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: rgba(255, 255, 255, 0.07);
+    --bs-btn-hover-border-color: rgba(255, 255, 255, 0.5);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: rgba(255, 255, 255, 0.12);
+    --bs-btn-active-border-color: rgba(255, 255, 255, 0.5);
+    --bs-btn-focus-shadow-rgb: 255, 255, 255;
+
+    border-radius: 10px;
+
+    padding: 8px 16px;
+
+    font-size: 14px;
+
+    transition: all 0.25s ease;
+}
+
+.social-navbar .social-logout-btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* Mobile */
+
+.navbar-toggler {
+    color: white !important;
+}
+
+@media (max-width: 991px) {
+
+    .social-navbar {
+        padding: 10px 0;
+    }
+
+    .social-navbar .navbar-collapse {
+        margin-top: 15px;
+
+        padding: 15px;
+
+        border-radius: 14px;
+
+        background: rgba(32, 36, 40, 0.98);
+
+        box-shadow:
+                0 15px 35px rgba(0, 0, 0, 0.20);
+    }
+
+    .social-nav-link {
+        padding: 10px 12px !important;
+    }
+
+    .social-login-link {
+        margin-top: 5px;
+    }
+
+    .social-get-started {
+        display: inline-block;
+
+        margin-top: 8px;
+    }
+
+    .social-logout-btn {
+        margin-top: 8px;
+    }
+}

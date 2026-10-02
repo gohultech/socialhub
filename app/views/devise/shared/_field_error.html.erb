@@ -1,0 +1,7 @@
+<% messages = resource.errors.full_messages_for(field) %>
+<% if messages.any? %>
+  <p id="<%= input_id %>-error" class="auth-field-error" role="alert">
+    <i class="bi bi-exclamation-circle-fill auth-error-icon" aria-hidden="true"></i>
+    <span><%= messages.to_sentence %></span>
+  </p>
+<% end %>

@@ -1,0 +1,29 @@
+<% active_section = local_assigns.fetch(:active_section, :home) %>
+
+<header class="home-feed-topbar">
+  <%= link_to root_path, class: "home-feed-topbar-brand", aria: { label: "CircleHub home" } do %>
+    <span class="home-feed-brand-mark"><i class="bi bi-people-fill"></i></span>
+    <span>Circle<span>Hub</span></span>
+  <% end %>
+
+  <%= form_with url: search_path, method: :get, local: true, class: "home-feed-search" do %>
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <%= text_field_tag :query, params[:query], placeholder: "Search for people, posts, or communities...", aria: { label: "Search CircleHub" } %>
+    <kbd>Ctrl K</kbd>
+  <% end %>
+
+  <nav class="home-feed-topbar-actions" aria-label="Quick navigation">
+    <%= link_to root_path, class: "home-feed-topbar-icon #{'is-active' if active_section == :home}", aria: { label: "Home" } do %><i class="bi bi-house-door-fill"></i><% end %>
+    <%= link_to messages_path, class: "home-feed-topbar-icon #{'is-active' if active_section == :messages}", aria: { label: "Messages" } do %><i class="bi bi-chat-dots"></i><% end %>
+    <%= link_to notifications_path, class: "home-feed-topbar-icon #{'is-active' if active_section == :notifications}", aria: { label: "Notifications" } do %><i class="bi bi-bell"></i><% end %>
+    <%= link_to profile_path, class: "home-feed-topbar-profile", aria: { label: "Your profile" } do %>
+      <% if current_user.profile&.avatar&.attached? %>
+        <%= image_tag current_user.profile.avatar, class: "home-feed-avatar", alt: "Your avatar" %>
+      <% else %>
+        <span class="home-feed-avatar home-feed-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+      <% end %>
+      <i class="bi bi-chevron-down" aria-hidden="true"></i>
+    <% end %>
+    <%= button_to destroy_user_session_path, method: :delete, class: "home-feed-topbar-logout", aria: { label: "Log out" } do %><i class="bi bi-box-arrow-right"></i><% end %>
+  </nav>
+</header>

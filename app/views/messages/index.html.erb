@@ -1,0 +1,72 @@
+<% current_username = current_user.profile&.username || current_user.email.split("@").first %>
+
+<div class="messages-page">
+  <%= render "shared/authenticated_topbar", active_section: :messages %>
+  <%= render "shared/authenticated_sidebar", active_section: :messages %>
+
+  <main class="messages-layout messages-layout-inbox">
+    <aside class="messages-inbox" aria-label="Conversations">
+      <header class="messages-inbox-header">
+        <div>
+          <span class="messages-eyebrow">Private space</span>
+          <h1>Messages</h1>
+        </div>
+        <%= link_to search_path, class: "messages-compose-new", aria: { label: "Find someone to message" } do %><i class="bi bi-pencil-square"></i><% end %>
+      </header>
+
+      <div class="messages-inbox-tools">
+        <label class="messages-search" for="conversation-search">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input id="conversation-search" type="search" placeholder="Search messages..." autocomplete="off">
+        </label>
+      </div>
+
+      <div class="messages-list">
+        <div class="messages-list-label"><span>Recent conversations</span><span><%= @users.size %></span></div>
+        <% if @users.any? %>
+          <% @users.each do |user| %>
+            <% username = user.profile&.username || user.email.split("@").first %>
+            <% last_message = @last_messages[user.id] %>
+            <%= link_to message_path(user), class: "messages-conversation" do %>
+              <% if user.profile&.avatar&.attached? %>
+                <%= image_tag user.profile.avatar, class: "messages-avatar", alt: "#{username}'s avatar" %>
+              <% else %>
+                <%= image_tag "default_avatar.png", class: "messages-avatar", alt: "Default avatar" %>
+              <% end %>
+              <span class="messages-conversation-copy">
+                <strong><%= username %></strong>
+                <% if last_message %>
+                  <small><%= "You: " if last_message.sender == current_user %><%= last_message.content %></small>
+                <% else %>
+                  <small>Start a conversation</small>
+                <% end %>
+              </span>
+              <% if last_message %><time><%= time_ago_in_words(last_message.created_at) %> ago</time><% end %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="messages-list-empty">
+            <span class="messages-list-empty-icon"><i class="bi bi-chat-heart"></i></span>
+            <strong>No conversations yet</strong>
+            <p>Start a conversation and connect with people in your circle.</p>
+            <%= link_to "Find people", search_path %>
+          </div>
+        <% end %>
+      </div>
+    </aside>
+
+    <section class="messages-empty-panel" aria-label="Messages">
+      <div class="messages-empty-art" aria-hidden="true">
+        <span class="messages-empty-orb messages-empty-orb-one"></span>
+        <span class="messages-empty-orb messages-empty-orb-two"></span>
+        <span class="messages-empty-icon"><i class="bi bi-send"></i></span>
+      </div>
+      <div class="messages-empty-copy">
+        <span class="messages-eyebrow">Your private space</span>
+        <h2>Your messages</h2>
+        <p>Select a conversation to start connecting with your circle.</p>
+        <small>Private conversations, shared moments, and meaningful connections.</small>
+      </div>
+    </section>
+  </main>
+</div>

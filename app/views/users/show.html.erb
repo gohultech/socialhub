@@ -1,70 +1,66 @@
-<div class="container mt-5">
+<% profile = @user.profile %>
 
-  <div class="card shadow p-4">
+<div class="user-profile-page">
+  <%= render "shared/authenticated_topbar", active_section: :search %>
+  <%= render "shared/authenticated_sidebar", active_section: :search %>
 
-    <h2>
-      <%= @user.profile.username %>
-    </h2>
+  <main class="profile-content">
+    <header class="profile-header">
+      <div class="profile-avatar-wrap">
+        <% if profile&.avatar&.attached? %>
+          <%= image_tag profile.avatar, class: "profile-avatar", alt: "#{profile.username}'s avatar" %>
+        <% else %>
+          <%= image_tag "default_avatar.png", class: "profile-avatar", alt: "Default avatar" %>
+        <% end %>
+      </div>
 
-    <% if current_user != @user %>
+      <div class="profile-header-details">
+        <div class="profile-title-row">
+          <h1><%= profile&.username || @user.email.split("@").first %></h1>
+          <% if current_user.following.include?(@user) %>
+            <%= button_to user_follow_path(@user), method: :delete, class: "profile-action profile-action-primary" do %><span>Following</span><% end %>
+          <% else %>
+            <%= button_to user_follow_path(@user), method: :post, class: "profile-action profile-action-primary" do %><span>Follow</span><% end %>
+          <% end %>
+        </div>
 
-      <% if current_user.following.include?(@user) %>
+        <div class="profile-stats" aria-label="Profile statistics">
+          <span><strong><%= @user.posts.count %></strong> posts</span>
+          <span><strong><%= @user.followers.count %></strong> followers</span>
+          <span><strong><%= @user.following.count %></strong> following</span>
+        </div>
 
-        <%= button_to "Following",
-                      user_follow_path(@user),
-                      method: :delete,
-                      class: "btn btn-outline-secondary mt-3" %>
+        <div class="profile-bio">
+          <% if profile&.full_name.present? %><strong><%= profile.full_name %></strong><% end %>
+          <% if profile&.bio.present? %><p><%= profile.bio %></p><% end %>
+          <% if profile&.location.present? %><span class="profile-meta"><i class="bi bi-geo-alt"></i><%= profile.location %></span><% end %>
+          <% if profile&.website.present? %><%= link_to profile.website, profile.website, target: "_blank", rel: "noopener noreferrer", class: "profile-website" %><% end %>
+        </div>
+      </div>
+    </header>
 
+    <nav class="profile-tabs" aria-label="Profile content">
+      <a href="#profile-posts" class="profile-tab is-active"><i class="bi bi-grid-3x3"></i><span>Posts</span></a>
+    </nav>
+
+    <section class="profile-post-grid" id="profile-posts" aria-label="Posts">
+      <% if @posts.any? %>
+        <% @posts.each do |post| %>
+          <%= link_to post_path(post), class: "profile-post-tile", aria: { label: "View post" } do %>
+            <% if post.image.attached? %>
+              <%= image_tag post.image, alt: "Post by #{profile&.username || @user.email.split("@").first}" %>
+            <% else %>
+              <span class="profile-text-post"><%= post.content %></span>
+            <% end %>
+            <span class="profile-post-overlay"><strong><i class="bi bi-heart-fill"></i> <%= post.likes.count %></strong><strong><i class="bi bi-chat-fill"></i> <%= post.comments.count %></strong></span>
+          <% end %>
+        <% end %>
       <% else %>
-
-        <%= button_to "Follow",
-                      user_follow_path(@user),
-                      method: :post,
-                      class: "btn btn-primary mt-3" %>
-
+        <div class="profile-empty-posts">
+          <i class="bi bi-grid-3x3"></i>
+          <h2>No posts yet</h2>
+        </div>
       <% end %>
-
-    <% end %>
-
-    <div class="row text-center my-4">
-
-      <div class="col">
-        <h4><%= @user.posts.count %></h4>
-        <small>Posts</small>
-      </div>
-
-      <div class="col">
-        <h4><%= @user.followers.count %></h4>
-        <small>Followers</small>
-      </div>
-
-      <div class="col">
-        <h4><%= @user.following.count %></h4>
-        <small>Following</small>
-      </div>
-
-    </div>
-
-  </div>
-
-  <h3 class="mt-5 mb-3">Posts</h3>
-
-  <% @posts.each do |post| %>
-
-    <div class="card mb-3">
-
-      <div class="card-body">
-
-        <p><%= render_hashtags(post.content) %></p>
-
-        <small class="text-muted">
-          <%= time_ago_in_words(post.created_at) %> ago
-        </small>
-
-      </div>
-
-    </div>
-
-  <% end %>
-
+    </section>
+  </main>
 </div>

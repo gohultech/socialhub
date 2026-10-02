@@ -1,4 +1,12 @@
-<div class="container mt-5">
+<% if user_signed_in? %>
+  <div class="simple-dashboard-page hashtag-page">
+    <%= render "shared/authenticated_topbar", active_section: :search %>
+    <%= render "shared/authenticated_sidebar", active_section: :search %>
+    <main class="simple-dashboard-main">
+      <div class="simple-dashboard-card">
+<% else %>
+  <div class="hashtag-public-page">
+<% end %>
 
   <h2 class="mb-4">
     Posts with #<%= @hashtag %>
@@ -17,7 +25,7 @@
           </h6>
 
           <p>
-            <%= render_hashtags(post.content) %>
+            <%= render_mentions(render_hashtags(post.content)) %>
           </p>
 
           <% if post.image.attached? %>
@@ -45,4 +53,10 @@
 
   <% end %>
 
-</div>
+<% if user_signed_in? %>
+      </div>
+    </main>
+  </div>
+<% else %>
+  </div>
+<% end %>

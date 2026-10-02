@@ -1,0 +1,10 @@
+Welcome to CircleHub
+
+Thanks for creating a CircleHub account with <%= @email %>. Please confirm that you own this email address to activate your account.
+
+Confirm your email:
+<%= user_confirmation_url(confirmation_token: @token) %>
+
+This confirmation link is valid for 3 days.
+
+If you did not create a CircleHub account, you can safely ignore this email. No account will be activated without confirmation.

@@ -18,11 +18,9 @@ Rails.application.routes.draw do
 
   resources :saved_posts, only: [:index]
 
-  resources :users, only: [:show] do
+  resources :users, only: [:index, :show] do
     resource :follow, only: [:create, :destroy]
   end
 
-  resources :conversations, only: [:index, :show, :create] do
-    resources :messages, only: [:create]
-  end
+    resources :messages, only: [:index, :show, :create]
 end

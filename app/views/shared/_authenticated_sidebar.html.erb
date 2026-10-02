@@ -1,0 +1,40 @@
+<% active_section = local_assigns.fetch(:active_section, :home) %>
+<% current_username = current_user.profile&.username || current_user.email.split("@").first %>
+
+<aside class="home-feed-sidebar" aria-label="Primary navigation">
+  <div class="home-feed-sidebar-label">Workspace</div>
+
+  <nav class="home-feed-nav">
+    <%= link_to root_path, class: "home-feed-nav-link #{'is-active' if active_section == :home}" do %><i class="bi bi-house-door"></i><span>Home</span><% end %>
+    <%= link_to search_path, class: "home-feed-nav-link #{'is-active' if active_section == :search}" do %><i class="bi bi-compass"></i><span>Explore</span><% end %>
+    <%= link_to messages_path, class: "home-feed-nav-link #{'is-active' if active_section == :messages}" do %><i class="bi bi-send"></i><span>Messages</span><% end %>
+    <%= link_to notifications_path, class: "home-feed-nav-link #{'is-active' if active_section == :notifications}" do %><i class="bi bi-heart"></i><span>Notifications</span><% end %>
+    <%= link_to new_post_path, class: "home-feed-nav-link #{'is-active' if active_section == :create}" do %><i class="bi bi-plus-square"></i><span>Create</span><% end %>
+    <%= link_to profile_path(anchor: "profile-saved"), class: "home-feed-nav-link" do %><i class="bi bi-bookmark"></i><span>Saved</span><% end %>
+    <%= link_to profile_path, class: "home-feed-nav-link #{'is-active' if active_section == :profile}" do %><i class="bi bi-person-circle"></i><span>Profile</span><% end %>
+  </nav>
+
+  <div class="home-feed-sidebar-section">
+    <div class="home-feed-sidebar-label">Communities</div>
+    <p class="home-feed-sidebar-empty">Your communities will appear here as you join them.</p>
+    <%= link_to search_path, class: "home-feed-discover-link" do %><i class="bi bi-arrow-up-right"></i><span>Discover more</span><% end %>
+  </div>
+
+  <%= link_to profile_path, class: "home-feed-sidebar-account" do %>
+    <% if current_user.profile&.avatar&.attached? %>
+      <%= image_tag current_user.profile.avatar, class: "home-feed-avatar", alt: "Your avatar" %>
+    <% else %>
+      <span class="home-feed-avatar home-feed-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+    <% end %>
+    <span><strong><%= current_username %></strong><small>View profile</small></span>
+    <i class="bi bi-chevron-right"></i>
+  <% end %>
+</aside>
+
+<nav class="home-feed-mobile-nav" aria-label="Mobile navigation">
+  <%= link_to root_path, aria: { label: "Home" }, class: ("is-active" if active_section == :home) do %><i class="bi bi-house-door-fill"></i><% end %>
+  <%= link_to search_path, aria: { label: "Search" }, class: ("is-active" if active_section == :search) do %><i class="bi bi-search"></i><% end %>
+  <%= link_to new_post_path, aria: { label: "Create a post" } do %><i class="bi bi-plus-square"></i><% end %>
+  <%= link_to notifications_path, aria: { label: "Notifications" }, class: ("is-active" if active_section == :notifications) do %><i class="bi bi-heart"></i><% end %>
+  <%= link_to profile_path, aria: { label: "Profile" }, class: ("is-active" if active_section == :profile) do %><i class="bi bi-person-circle"></i><% end %>
+</nav>

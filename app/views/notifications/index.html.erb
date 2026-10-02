@@ -1,45 +1,179 @@
-<div class="container mt-5">
+<div class="notifications-page">
+  <%= render "shared/authenticated_topbar", active_section: :notifications %>
+  <%= render "shared/authenticated_sidebar", active_section: :notifications %>
 
-  <h2 class="mb-4">Notifications</h2>
-
-  <% if @notifications.any? %>
-
-    <% @notifications.each do |notification| %>
-
-      <div class="card mb-3 shadow-sm">
-
-        <div class="card-body">
-
-          <strong>
-            <%= notification.actor.profile&.username || notification.actor.email.split("@").first %>
-          </strong>
-
-          <% if notification.action == "liked" %>
-            liked your post ❤️
-          <% elsif notification.action == "commented" %>
-            commented on your post 💬
-          <% elsif notification.action == "followed" %>
-            started following you 👤
-          <% end %>
-
-          <br>
-
-          <small class="text-muted">
-            <%= time_ago_in_words(notification.created_at) %> ago
-          </small>
-
+  <main class="notifications-layout">
+    <div class="notifications-main">
+      <header class="notifications-hero">
+        <div class="notifications-hero-icon" aria-hidden="true">
+          <i class="bi bi-bell-fill"></i>
         </div>
+        <div>
+          <p class="notifications-eyebrow">Stay connected</p>
+          <h1>Notifications</h1>
+          <p class="notifications-hero-copy">Stay up to date with your CircleHub community.</p>
+        </div>
+      </header>
 
-      </div>
+      <nav class="notifications-filters" aria-label="Notification filters">
+        <% ["All", "Mentions", "Follows", "Likes", "Comments", "System"].each_with_index do |filter, index| %>
+          <span class="notifications-filter <%= "is-active" if index.zero? %>"<%= " aria-current=\"page\"" if index.zero? %>><%= filter %></span>
+        <% end %>
+      </nav>
 
-    <% end %>
+      <% if @notifications.any? %>
+        <% notification_groups = @notifications.group_by do |notification|
+             notification_date = notification.created_at.to_date
+             if notification_date == Date.current
+               "Today"
+             elsif notification_date == Date.current.yesterday
+               "Yesterday"
+             elsif notification_date >= Date.current.beginning_of_week
+               "This week"
+             elsif notification_date >= Date.current.beginning_of_month
+               "This month"
+             else
+               notification.created_at.strftime("%B %-d, %Y")
+             end
+           end %>
+        <section class="notifications-list" aria-label="Your notifications">
+          <% notification_groups.each_with_index do |(group_label, notifications), index| %>
+            <section class="notifications-group" aria-labelledby="notification-group-<%= index %>">
+              <div class="notifications-group-heading">
+                <h2 id="notification-group-<%= index %>"><%= group_label %></h2>
+                <span><%= notifications.size %> <%= "update".pluralize(notifications.size) %></span>
+              </div>
 
-  <% else %>
+              <% notifications.each do |notification| %>
+                <% actor = notification.actor %>
+                <% actor_name = actor.profile&.username || actor.email.split("@").first %>
+                <% related_post = case notification.notifiable
+                                  when Post then notification.notifiable
+                                  when Comment then notification.notifiable.post
+                                  end %>
+                <% action_text = case notification.action
+                                 when "liked" then "liked your post"
+                                 when "commented" then "commented on your post"
+                                 when "followed" then "started following you"
+                                 else notification.action.to_s
+                                 end %>
+                <% notification_icon = case notification.action
+                                       when "liked" then "bi-heart-fill"
+                                       when "commented" then "bi-chat-heart-fill"
+                                       when "followed" then "bi-person-plus-fill"
+                                       else "bi-bell-fill"
+                                       end %>
 
-    <div class="alert alert-info">
-      No notifications yet.
+                <article class="notification-card <%= 'is-unread' unless notification.read? %>">
+                  <div class="notification-type-icon" aria-hidden="true"><i class="bi <%= notification_icon %>"></i></div>
+                  <%= link_to user_path(actor), class: "notification-avatar-link", aria: { label: "View #{actor_name}'s profile" } do %>
+                    <% if actor.profile&.avatar&.attached? %>
+                      <%= image_tag actor.profile.avatar, class: "notification-avatar", alt: "#{actor_name}'s avatar" %>
+                    <% else %>
+                      <%= image_tag "default_avatar.png", class: "notification-avatar", alt: "Default avatar" %>
+                    <% end %>
+                  <% end %>
+
+                  <div class="notification-copy">
+                    <p>
+                      <%= link_to actor_name, user_path(actor), class: "notification-actor" %>
+                      <% if related_post %>
+                        <%= link_to action_text, post_path(related_post), class: "notification-action" %>
+                      <% else %>
+                        <span class="notification-action"><%= action_text %></span>
+                      <% end %>
+                    </p>
+                    <% if notification.action == "commented" && notification.notifiable.respond_to?(:content) && notification.notifiable.content.present? %>
+                      <p class="notification-preview"><%= notification.notifiable.content %></p>
+                    <% end %>
+                    <time datetime="<%= notification.created_at.iso8601 %>"><%= time_ago_in_words(notification.created_at) %> ago</time>
+                  </div>
+
+                  <div class="notification-endcap">
+                    <% if notification.action == "followed" %>
+                      <% if current_user.following.exists?(id: actor.id) %>
+                        <%= button_to "Following", user_follow_path(actor), method: :delete, class: "notification-action-button notification-action-button-secondary" %>
+                      <% else %>
+                        <%= button_to "Follow back", user_follow_path(actor), method: :post, class: "notification-action-button" %>
+                      <% end %>
+                    <% elsif related_post&.image&.attached? %>
+                      <%= link_to post_path(related_post), class: "notification-post-thumbnail", aria: { label: "Open related post" } do %>
+                        <%= image_tag related_post.image, alt: "Related post" %>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </article>
+              <% end %>
+            </section>
+          <% end %>
+        </section>
+      <% else %>
+        <section class="notifications-empty" aria-label="No notifications">
+          <span class="notifications-empty-icon" aria-hidden="true"><i class="bi bi-bell"></i></span>
+          <p class="notifications-eyebrow">All caught up</p>
+          <h2>No notifications yet</h2>
+          <p>You're all caught up. New activity from your CircleHub community will appear here.</p>
+          <%= link_to "Explore people →", search_path, class: "notifications-empty-link" %>
+        </section>
+      <% end %>
     </div>
 
-  <% end %>
+    <aside class="notifications-rail" aria-label="Notification tools">
+      <section class="notifications-rail-card">
+        <div class="notifications-rail-heading">
+          <div>
+            <p class="notifications-eyebrow">Organize your activity</p>
+            <h2>Notification filters</h2>
+          </div>
+          <span class="notifications-rail-icon" aria-hidden="true"><i class="bi bi-sliders2"></i></span>
+        </div>
+        <div class="notifications-rail-filters">
+          <% ["All", "Mentions", "Follows", "Likes", "Comments", "System"].each_with_index do |filter, index| %>
+            <span class="notifications-rail-filter <%= "is-active" if index.zero? %>"><%= filter %><% if index.zero? %><i class="bi bi-check2"></i><% end %></span>
+          <% end %>
+        </div>
+      </section>
 
+      <% notification_people = @notifications.map(&:actor).compact.uniq.reject { |actor| actor == current_user }.first(3) %>
+      <% if notification_people.any? %>
+        <section class="notifications-rail-card">
+          <div class="notifications-rail-heading">
+            <h2>People in your circle</h2>
+            <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+          </div>
+          <div class="notification-people-list">
+            <% notification_people.each do |person| %>
+              <% person_name = person.profile&.username || person.email.split("@").first %>
+              <div class="notification-person">
+                <%= link_to user_path(person), class: "notification-person-avatar", aria: { label: "View #{person_name}'s profile" } do %>
+                  <% if person.profile&.avatar&.attached? %>
+                    <%= image_tag person.profile.avatar, alt: "#{person_name}'s avatar" %>
+                  <% else %>
+                    <%= image_tag "default_avatar.png", alt: "Default avatar" %>
+                  <% end %>
+                <% end %>
+                <div>
+                  <%= link_to person_name, user_path(person), class: "notification-person-name" %>
+                  <span>From your recent activity</span>
+                </div>
+                <% if current_user.following.exists?(id: person.id) %>
+                  <%= button_to "Following", user_follow_path(person), method: :delete, class: "notification-person-action is-following" %>
+                <% else %>
+                  <%= button_to "Follow", user_follow_path(person), method: :post, class: "notification-person-action" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <section class="notifications-community-card">
+        <span class="notifications-community-icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
+        <p class="notifications-eyebrow">Keep in the loop</p>
+        <h2>Never miss what matters.</h2>
+        <p>Stay connected with your friends, posts, and communities.</p>
+        <%= link_to "Explore people →", search_path, class: "notifications-community-link" %>
+      </section>
+    </aside>
+  </main>
 </div>

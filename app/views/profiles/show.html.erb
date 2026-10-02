@@ -1,71 +1,157 @@
-<div class="container mt-5">
+<% profile_user = current_user %>
+<% profile_posts = profile_user.posts.order(created_at: :desc) %>
+<% saved_posts = profile_user.saved.order(created_at: :desc) %>
+<% profile_name = @profile.username.presence || profile_user.email.split("@").first %>
+<% completion_fields = [@profile.avatar.attached?, @profile.bio.present?, @profile.location.present?, @profile.website.present?] %>
+<% completion_percentage = ((completion_fields.count(true).to_f / completion_fields.length) * 100).round %>
 
-  <div class="card shadow p-4">
+<div class="profile-dashboard-page">
+  <%= render "shared/authenticated_topbar", active_section: :profile %>
+  <%= render "shared/authenticated_sidebar", active_section: :profile %>
 
-    <h2 class="mb-4">My Profile</h2>
+  <main class="profile-dashboard-layout">
+    <div class="profile-dashboard-main">
+      <section class="profile-identity-card" aria-labelledby="profile-name">
+        <div class="profile-cover <%= 'has-image' if @profile.cover_photo.attached? %>" aria-label="Profile cover">
+          <% if @profile.cover_photo.attached? %>
+            <%= image_tag @profile.cover_photo, class: "profile-cover-image", alt: "#{profile_name}'s profile cover" %>
+            <span class="profile-cover-overlay" aria-hidden="true"></span>
+          <% else %>
+            <span class="profile-cover-orb profile-cover-orb-one"></span>
+            <span class="profile-cover-orb profile-cover-orb-two"></span>
+            <span class="profile-cover-grid"></span>
+          <% end %>
+          <%= form_with model: @profile, url: profile_path, method: :patch, local: true, class: "profile-cover-upload-form", html: { multipart: true, data: { profile_cover_upload_form: true } } do |f| %>
+            <button type="button" class="profile-cover-edit" data-profile-cover-upload-trigger aria-label="Change cover photo"><i class="bi bi-camera" aria-hidden="true"></i><span>Edit cover</span></button>
+            <%= f.file_field :cover_photo, class: "profile-cover-file-input", accept: "image/*", data: { profile_cover_upload_target: "input" } %>
+            <button type="button" class="profile-cover-remove" data-profile-cover-upload-remove aria-label="Cancel selected cover photo" hidden><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+            <p class="profile-cover-upload-status" data-profile-cover-upload-status role="status" aria-live="polite" hidden></p>
+          <% end %>
+        </div>
 
-    <div class="row text-center mb-4">
+        <div class="profile-identity-body">
+          <div class="profile-avatar-wrap">
+            <% if @profile.avatar.attached? %>
+              <%= image_tag @profile.avatar, class: "profile-dashboard-avatar", alt: "#{profile_name}'s avatar" %>
+            <% else %>
+              <%= image_tag "default_avatar.png", class: "profile-dashboard-avatar", alt: "Default avatar" %>
+            <% end %>
+          </div>
 
-      <div class="col">
-        <h4><%= current_user.posts.count %></h4>
-        <small class="text-muted">Posts</small>
-      </div>
+          <div class="profile-identity-content">
+            <div class="profile-identity-heading">
+              <div>
+                <p class="profile-dashboard-eyebrow">CircleHub member</p>
+                <h1 id="profile-name"><%= profile_name %></h1>
+                <% if @profile.full_name.present? %><p class="profile-full-name"><%= @profile.full_name %></p><% end %>
+              </div>
+              <div class="profile-identity-actions">
+                <%= link_to edit_profile_path, class: "profile-dashboard-edit" do %><i class="bi bi-pencil-square" aria-hidden="true"></i><span>Edit profile</span><% end %>
+                <%= link_to edit_profile_path, class: "profile-dashboard-settings", aria: { label: "Profile settings" } do %><i class="bi bi-gear" aria-hidden="true"></i><% end %>
+              </div>
+            </div>
 
-      <div class="col">
-        <h4><%= current_user.followers.count %></h4>
-        <small class="text-muted">Followers</small>
-      </div>
+            <div class="profile-dashboard-stats" aria-label="Profile statistics">
+              <span><strong><%= profile_posts.count %></strong> posts</span>
+              <span><strong><%= profile_user.followers.count %></strong> followers</span>
+              <span><strong><%= profile_user.following.count %></strong> following</span>
+            </div>
 
-      <div class="col">
-        <h4><%= current_user.following.count %></h4>
-        <small class="text-muted">Following</small>
-      </div>
+            <% if @profile.bio.present? || @profile.location.present? || @profile.website.present? %>
+              <div class="profile-dashboard-bio">
+                <% if @profile.bio.present? %><p><%= @profile.bio %></p><% end %>
+                <div class="profile-dashboard-meta">
+                  <% if @profile.location.present? %><span><i class="bi bi-geo-alt" aria-hidden="true"></i><%= @profile.location %></span><% end %>
+                  <% if @profile.website.present? %><%= link_to @profile.website, @profile.website, target: "_blank", rel: "noopener noreferrer" do %><i class="bi bi-link-45deg" aria-hidden="true"></i><%= @profile.website %><% end %><% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </section>
 
+      <nav class="profile-dashboard-tabs" aria-label="Profile content">
+        <a href="#profile-posts" class="profile-dashboard-tab profile-posts-tab is-active"><i class="bi bi-grid-3x3" aria-hidden="true"></i><span>Posts</span></a>
+        <a href="#profile-saved" class="profile-dashboard-tab profile-saved-tab"><i class="bi bi-bookmark" aria-hidden="true"></i><span>Saved</span></a>
+      </nav>
+
+      <section class="profile-dashboard-post-grid" id="profile-posts" aria-label="Posts">
+        <% if profile_posts.any? %>
+          <% profile_posts.each do |post| %>
+            <%= link_to post_path(post), class: "profile-dashboard-post", aria: { label: "View post" } do %>
+              <% if post.image.attached? %>
+                <%= image_tag post.image, alt: "Post by #{profile_name}" %>
+              <% else %>
+                <span class="profile-dashboard-text-post"><%= post.content %></span>
+              <% end %>
+              <span class="profile-dashboard-post-overlay"><strong><i class="bi bi-heart-fill" aria-hidden="true"></i> <%= post.likes.count %></strong><strong><i class="bi bi-chat-fill" aria-hidden="true"></i> <%= post.comments.count %></strong></span>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="profile-dashboard-empty">
+            <span class="profile-dashboard-empty-icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
+            <p class="profile-dashboard-eyebrow">Your profile is ready</p>
+            <h2>No posts yet</h2>
+            <p>Share your thoughts, ideas, photos, or moments with the CircleHub community.</p>
+            <%= link_to "Create your first post →", new_post_path, class: "profile-dashboard-empty-cta" %>
+            <div class="profile-dashboard-guidance">
+              <div><i class="bi bi-camera" aria-hidden="true"></i><strong>Share moments</strong><span>Post photos from your day</span></div>
+              <div><i class="bi bi-lightbulb" aria-hidden="true"></i><strong>Share ideas</strong><span>Start a discussion</span></div>
+              <div><i class="bi bi-people" aria-hidden="true"></i><strong>Connect</strong><span>Engage with the community</span></div>
+              <div><i class="bi bi-magic" aria-hidden="true"></i><strong>Express yourself</strong><span>Let your creativity shine</span></div>
+            </div>
+          </div>
+        <% end %>
+      </section>
+
+      <section class="profile-dashboard-post-grid profile-dashboard-saved-grid" id="profile-saved" aria-label="Saved posts">
+        <% if saved_posts.any? %>
+          <% saved_posts.each do |post| %>
+            <%= link_to post_path(post), class: "profile-dashboard-post", aria: { label: "View saved post" } do %>
+              <% if post.image.attached? %>
+                <%= image_tag post.image, alt: "Saved post by #{post.user.profile&.username || post.user.email.split('@').first}" %>
+              <% else %>
+                <span class="profile-dashboard-text-post"><%= post.content %></span>
+              <% end %>
+              <span class="profile-dashboard-post-overlay"><strong><i class="bi bi-heart-fill" aria-hidden="true"></i> <%= post.likes.count %></strong><strong><i class="bi bi-chat-fill" aria-hidden="true"></i> <%= post.comments.count %></strong></span>
+              <span class="profile-dashboard-saved-indicator" aria-hidden="true"><i class="bi bi-bookmark-fill"></i></span>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="profile-dashboard-empty profile-dashboard-empty-saved">
+            <span class="profile-dashboard-empty-icon" aria-hidden="true"><i class="bi bi-bookmark"></i></span>
+            <h2>No saved posts yet</h2>
+            <p>Posts you save will appear here.</p>
+          </div>
+        <% end %>
+      </section>
     </div>
 
-    <hr>
+    <aside class="profile-dashboard-rail" aria-label="Profile overview">
+      <% if completion_percentage < 100 %>
+        <section class="profile-dashboard-rail-card profile-completion-card">
+          <div class="profile-dashboard-rail-heading"><div><p class="profile-dashboard-eyebrow">Make it yours</p><h2>Profile completion</h2></div><span class="profile-completion-ring" style="--completion: <%= completion_percentage %>%"><strong><%= completion_percentage %>%</strong></span></div>
+          <p>Complete your profile so your circle knows more about you.</p>
+          <%= link_to "Complete your profile →", edit_profile_path, class: "profile-dashboard-rail-link" %>
+        </section>
+      <% end %>
 
-    <% if @profile.avatar.attached? %>
-      <%= image_tag @profile.avatar,
-                    class: "rounded-circle",
-                    width: 150,
-                    height: 150 %>
-    <% else %>
-      <%= image_tag "default_avatar.png",
-                    class: "rounded-circle",
-                    width: 150,
-                    height: 150 %>
-    <% end %>
+      <section class="profile-dashboard-rail-card">
+        <div class="profile-dashboard-rail-heading"><div><p class="profile-dashboard-eyebrow">Your activity</p><h2>Your stats</h2></div><i class="bi bi-bar-chart-line" aria-hidden="true"></i></div>
+        <div class="profile-dashboard-stat-list">
+          <div><strong><%= profile_posts.count %></strong><span>Posts shared</span></div>
+          <div><strong><%= profile_user.followers.count %></strong><span>Followers</span></div>
+          <div><strong><%= profile_user.following.count %></strong><span>Following</span></div>
+        </div>
+      </section>
 
-    <p>
-      <strong>Username:</strong>
-      <%= @profile.username %>
-    </p>
-
-    <p>
-      <strong>Full Name:</strong>
-      <%= @profile.full_name.presence || "-" %>
-    </p>
-
-    <p>
-      <strong>Bio:</strong>
-      <%= @profile.bio.presence || "-" %>
-    </p>
-
-    <p>
-      <strong>Website:</strong>
-      <%= @profile.website.presence || "-" %>
-    </p>
-
-    <p>
-      <strong>Location:</strong>
-      <%= @profile.location.presence || "-" %>
-    </p>
-
-    <%= link_to "Edit Profile",
-                edit_profile_path,
-                class: "btn btn-primary mt-3" %>
-
-  </div>
-
+      <section class="profile-dashboard-community-card">
+        <span class="profile-dashboard-small-icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
+        <p class="profile-dashboard-eyebrow">Keep sharing</p>
+        <h2>Your circle is waiting.</h2>
+        <p>Reconnect with your communities, conversations, and people on CircleHub.</p>
+        <%= link_to "Create a post →", new_post_path, class: "profile-dashboard-community-link" %>
+      </section>
+    </aside>
+  </main>
 </div>

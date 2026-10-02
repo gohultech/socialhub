@@ -1,45 +1,174 @@
-<div class="container mt-5">
+<% profile_name = @profile.username.presence || current_user.email.split("@").first %>
+<% completion_items = [
+     ["Profile photo", @profile.avatar.attached?],
+     ["Bio", @profile.bio.present?],
+     ["Location", @profile.location.present?],
+     ["Website", @profile.website.present?],
+     ["Following people", current_user.following.exists?]
+   ] %>
+<% completion_percentage = ((completion_items.count { |_, complete| complete }.to_f / completion_items.length) * 100).round %>
 
-  <div class="card shadow p-4">
+<div class="edit-profile-page">
+  <%= render "shared/authenticated_topbar", active_section: :profile %>
+  <%= render "shared/authenticated_sidebar", active_section: :profile %>
 
-    <h2 class="mb-4">Edit Profile</h2>
+  <main class="edit-profile-layout">
+    <div class="edit-profile-main">
+      <%= link_to profile_path, class: "edit-profile-back" do %><i class="bi bi-arrow-left" aria-hidden="true"></i> Back to profile<% end %>
 
-    <%= form_with model: @profile, url: profile_path, local: true do |f| %>
+      <header class="edit-profile-header">
+        <p class="edit-profile-eyebrow">Your CircleHub identity</p>
+        <h1>Edit Profile</h1>
+        <p>Update your information and let the community know more about you.</p>
+      </header>
 
-      <div class="mb-3">
-        <%= f.label :username %>
-        <%= f.text_field :username, class: "form-control" %>
-      </div>
+      <section class="edit-profile-card" aria-labelledby="edit-profile-form-heading">
+        <div class="edit-profile-card-heading">
+          <div>
+            <p class="edit-profile-eyebrow">Personal details</p>
+            <h2 id="edit-profile-form-heading">Make your profile yours</h2>
+          </div>
+          <span class="edit-profile-card-icon" aria-hidden="true"><i class="bi bi-person-badge"></i></span>
+        </div>
 
-      <div class="mb-3">
-        <%= f.label :full_name %>
-        <%= f.text_field :full_name, class: "form-control" %>
-      </div>
+        <%= form_with model: @profile, url: profile_path, local: true, class: "edit-profile-form", html: { multipart: true } do |f| %>
+          <% if @profile.errors.any? %>
+            <div class="edit-profile-errors" role="alert" aria-live="polite">
+              <div><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i><strong>Please fix the following errors:</strong></div>
+              <ul>
+                <% @profile.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
 
-      <div class="mb-3">
-        <%= f.label :bio %>
-        <%= f.text_area :bio, class: "form-control", rows: 4 %>
-      </div>
+          <section class="edit-profile-cover-section" aria-labelledby="edit-profile-cover-heading">
+            <div class="edit-profile-cover-heading">
+              <div>
+                <p class="edit-profile-eyebrow">Your profile canvas</p>
+                <h3 id="edit-profile-cover-heading">Cover photo</h3>
+                <p>Set the tone for your CircleHub profile with a wide banner image.</p>
+              </div>
+              <span class="edit-profile-cover-icon" aria-hidden="true"><i class="bi bi-image"></i></span>
+            </div>
 
-      <div class="mb-3">
-        <%= f.label :website %>
-        <%= f.text_field :website, class: "form-control" %>
-      </div>
+            <div class="edit-profile-cover-preview <%= 'has-image' if @profile.cover_photo.attached? %>" data-profile-cover-preview>
+              <% if @profile.cover_photo.attached? %>
+                <%= image_tag @profile.cover_photo, class: "edit-profile-cover-image", alt: "Current profile cover" %>
+              <% else %>
+                <span class="edit-profile-cover-fallback-orb edit-profile-cover-fallback-orb-one"></span>
+                <span class="edit-profile-cover-fallback-orb edit-profile-cover-fallback-orb-two"></span>
+                <span class="edit-profile-cover-fallback-grid"></span>
+              <% end %>
+              <span class="edit-profile-cover-overlay" aria-hidden="true"></span>
+              <span class="edit-profile-cover-preview-label">CircleHub profile cover</span>
+            </div>
 
-      <div class="mb-3">
-        <%= f.label :location %>
-        <%= f.text_field :location, class: "form-control" %>
-      </div>
+            <div class="edit-profile-cover-action">
+              <%= f.label :cover_photo, class: "edit-profile-change-cover" do %><i class="bi bi-camera" aria-hidden="true"></i> Change cover<% end %>
+              <%= f.file_field :cover_photo, class: "edit-profile-file-input", accept: "image/*", data: { profile_cover_preview_target: "input" } %>
+              <p class="edit-profile-cover-help">JPG, PNG, WEBP, or GIF · up to 5 MB</p>
+              <p class="edit-profile-upload-error" data-profile-cover-preview-error role="alert" hidden></p>
+            </div>
+          </section>
 
-      <div class="mb-3">
-        <%= f.label :avatar, class: "form-label" %>
-        <%= f.file_field :avatar, class: "form-control" %>
-      </div>
+          <section class="edit-profile-photo-row" aria-label="Profile photo">
+            <% if @profile.avatar.attached? %>
+              <%= image_tag @profile.avatar, class: "edit-profile-avatar", alt: "#{profile_name}'s avatar" %>
+            <% else %>
+              <%= image_tag "default_avatar.png", class: "edit-profile-avatar", alt: "Default avatar" %>
+            <% end %>
 
-      <%= f.submit "Update Profile", class: "btn btn-success" %>
+            <div class="edit-profile-photo-details">
+              <strong><%= profile_name %></strong>
+              <span><%= @profile.full_name.presence || "CircleHub member" %></span>
+              <small>Use a clear photo so your circle recognizes you.</small>
+            </div>
 
-    <% end %>
+            <div class="edit-profile-photo-action">
+              <%= f.label :avatar, class: "edit-profile-change-photo" do %><i class="bi bi-camera" aria-hidden="true"></i> Change photo<% end %>
+            <%= f.file_field :avatar, class: "edit-profile-file-input", accept: "image/*", data: { profile_avatar_preview_target: "input" } %>
+            <p class="edit-profile-upload-error" data-profile-avatar-preview-error role="alert" hidden></p>
+            </div>
+          </section>
 
-  </div>
+          <div class="edit-profile-fields">
+            <div class="edit-profile-field">
+              <%= f.label :username, "Username" %>
+              <%= f.text_field :username, placeholder: "Enter your username" %>
+              <small>This is how people will identify you on CircleHub.</small>
+            </div>
 
+            <div class="edit-profile-field">
+              <%= f.label :full_name, "Full name" %>
+              <%= f.text_field :full_name, placeholder: "Enter your full name" %>
+            </div>
+
+            <div class="edit-profile-field">
+              <%= f.label :bio, "Bio" %>
+              <%= f.text_area :bio, rows: 4, placeholder: "Tell the community a little about yourself..." %>
+            </div>
+
+            <div class="edit-profile-field">
+              <%= f.label :website, "Website" %>
+              <div class="edit-profile-input-with-icon"><i class="bi bi-link-45deg" aria-hidden="true"></i><%= f.text_field :website, placeholder: "https://example.com" %></div>
+            </div>
+
+            <div class="edit-profile-field">
+              <%= f.label :location, "Location" %>
+              <div class="edit-profile-input-with-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i><%= f.text_field :location, placeholder: "City, Country" %></div>
+            </div>
+          </div>
+
+          <footer class="edit-profile-actions">
+            <%= link_to "Cancel", profile_path, class: "edit-profile-cancel" %>
+            <%= f.submit "Save changes", class: "edit-profile-submit" %>
+          </footer>
+        <% end %>
+      </section>
+    </div>
+
+    <aside class="edit-profile-rail" aria-label="Profile guidance">
+      <% if completion_percentage < 100 %>
+        <section class="edit-profile-rail-card edit-profile-completion-card">
+          <div class="edit-profile-rail-heading"><div><p class="edit-profile-eyebrow">Keep going</p><h2>Profile Completion</h2></div><span class="edit-profile-completion-ring" style="--completion: <%= completion_percentage %>%"><strong><%= completion_percentage %>%</strong></span></div>
+          <p>A complete profile helps your circle connect with you.</p>
+          <ul class="edit-profile-checklist">
+            <% completion_items.each do |label, complete| %>
+              <li class="<%= "is-complete" if complete %>"><i class="bi <%= complete ? "bi-check-circle-fill" : "bi-circle" %>" aria-hidden="true"></i><span><%= label %></span></li>
+            <% end %>
+          </ul>
+        </section>
+      <% end %>
+
+      <section class="edit-profile-rail-card">
+        <div class="edit-profile-rail-heading"><div><p class="edit-profile-eyebrow">Stand out naturally</p><h2>Profile Tips</h2></div><span class="edit-profile-rail-icon" aria-hidden="true"><i class="bi bi-lightbulb"></i></span></div>
+        <p>A few tips to make your profile stand out.</p>
+        <ul class="edit-profile-tips">
+          <li>Use a clear profile photo</li>
+          <li>Write a short and authentic bio</li>
+          <li>Add your location</li>
+          <li>Share your website or portfolio</li>
+          <li>Follow and engage with others</li>
+        </ul>
+      </section>
+
+      <section class="edit-profile-preview-card">
+        <p class="edit-profile-eyebrow">A quick look</p>
+        <h2>Profile Preview</h2>
+        <p class="edit-profile-preview-subtitle">This is how your profile looks to others.</p>
+        <div class="edit-profile-preview-user">
+          <% if @profile.avatar.attached? %>
+            <%= image_tag @profile.avatar, alt: "#{profile_name}'s avatar" %>
+          <% else %>
+            <%= image_tag "default_avatar.png", alt: "Default avatar" %>
+          <% end %>
+          <div><strong><%= profile_name %></strong><span><%= @profile.full_name.presence || "CircleHub member" %></span></div>
+        </div>
+        <% if @profile.bio.present? %><p class="edit-profile-preview-bio"><%= @profile.bio %></p><% end %>
+        <div class="edit-profile-preview-stats"><span><strong><%= current_user.posts.count %></strong> posts</span><span><strong><%= current_user.followers.count %></strong> followers</span><span><strong><%= current_user.following.count %></strong> following</span></div>
+      </section>
+    </aside>
+  </main>
 </div>

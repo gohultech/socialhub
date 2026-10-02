@@ -1,11 +1,14 @@
+<div class="auth-legacy-page">
 <h2>Edit <%= resource_name.to_s.humanize %></h2>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "auth-legacy-form" }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="field">
     <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+    <% email_has_error = resource.errors[:email].present? %>
+    <p><%= f.email_field :email, autofocus: true, autocomplete: "email", class: ("auth-input-error" if email_has_error), aria: (email_has_error ? { invalid: true, describedby: "user_email_error" } : {}) %></p>
+    <%= render "devise/shared/field_error", resource: resource, field: :email, input_id: "user_email" %>
   </div>
 
   <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
@@ -14,7 +17,9 @@
 
   <div class="field">
     <p><%= f.label :password %> <i>(leave blank if you don't want to change it)</i></p>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
+    <% password_has_error = resource.errors[:password].present? %>
+    <p><%= f.password_field :password, autocomplete: "new-password", class: ("auth-input-error" if password_has_error), aria: (password_has_error ? { invalid: true, describedby: "user_password_error" } : {}) %></p>
+    <%= render "devise/shared/field_error", resource: resource, field: :password, input_id: "user_password" %>
     <% if @minimum_password_length %>
       <p><em><%= @minimum_password_length %> characters minimum</em></p>
     <% end %>
@@ -22,12 +27,16 @@
 
   <div class="field">
     <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
+    <% confirmation_has_error = resource.errors[:password_confirmation].present? %>
+    <p><%= f.password_field :password_confirmation, autocomplete: "new-password", class: ("auth-input-error" if confirmation_has_error), aria: (confirmation_has_error ? { invalid: true, describedby: "user_password_confirmation_error" } : {}) %></p>
+    <%= render "devise/shared/field_error", resource: resource, field: :password_confirmation, input_id: "user_password_confirmation" %>
   </div>
 
   <div class="field">
     <p><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i></p>
-    <p><%= f.password_field :current_password, autocomplete: "current-password" %></p>
+    <% current_password_has_error = resource.errors[:current_password].present? %>
+    <p><%= f.password_field :current_password, autocomplete: "current-password", class: ("auth-input-error" if current_password_has_error), aria: (current_password_has_error ? { invalid: true, describedby: "user_current_password_error" } : {}) %></p>
+    <%= render "devise/shared/field_error", resource: resource, field: :current_password, input_id: "user_current_password" %>
   </div>
 
   <div class="actions">
@@ -40,3 +49,4 @@
 <div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
 
 <%= link_to "Back", :back %>
+</div>

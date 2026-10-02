@@ -1,0 +1,46 @@
+.auth-error-summary { display: flex; align-items: center; gap: 10px; min-width: 0; margin: 0 0 18px; padding: 10px 12px; border: 1px solid rgba(244, 114, 182, .28); border-radius: 12px; background: rgba(91, 35, 72, .2); color: #ffd7e7; }
+.auth-error-summary-icon { display: grid; flex: 0 0 27px; width: 27px; height: 27px; place-items: center; border: 1px solid rgba(251, 146, 180, .28); border-radius: 8px; background: rgba(244, 114, 182, .1); color: #f6a1c2; font-size: 12px; }
+.auth-error-summary strong, .auth-error-summary span { display: block; overflow-wrap: anywhere; }
+.auth-error-summary strong { color: #ffe5ef; font-size: 11px; line-height: 1.3; }
+.auth-error-summary div > span { margin-top: 2px; color: #d5aabd; font-size: 10px; line-height: 1.35; }
+.auth-field-error { display: flex; align-items: flex-start; gap: 5px; min-width: 0; margin: 6px 0 0; color: #f6a1c2; font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
+.auth-error-icon { flex: 0 0 auto; margin-top: 1px; color: #f08bb4; font-size: 10px; }
+.auth-input-error { border-color: rgba(244, 114, 182, .52) !important; box-shadow: 0 0 0 2px rgba(244, 114, 182, .06), 0 0 18px rgba(236, 72, 153, .08) !important; }
+.auth-input-error:focus { border-color: rgba(251, 146, 180, .78) !important; box-shadow: 0 0 0 3px rgba(244, 114, 182, .1), 0 0 22px rgba(236, 72, 153, .1) !important; }
+
+.site-flash-container { width: min(calc(100% - 32px), 600px); margin: 14px auto 0; }
+.auth-flash { display: flex; align-items: flex-start; gap: 9px; min-width: 0; padding: 10px 13px; border: 1px solid rgba(148, 163, 184, .18); border-radius: 12px; background: rgba(16, 28, 48, .9); box-shadow: 0 14px 32px rgba(0, 0, 0, .16); color: #dbeafe; font-size: 12px; line-height: 1.45; }
+.auth-flash > i { flex: 0 0 auto; margin-top: 2px; }
+.auth-flash span { min-width: 0; overflow-wrap: anywhere; }
+.auth-flash-success { border-color: rgba(45, 212, 191, .26); background: rgba(13, 70, 73, .28); color: #b7f7e8; }
+.auth-flash-success > i { color: #5eead4; }
+.auth-flash-error { border-color: rgba(244, 114, 182, .28); background: rgba(91, 35, 72, .24); color: #ffd7e7; }
+.auth-flash-error > i { color: #f6a1c2; }
+.auth-flash-info { border-color: rgba(96, 165, 250, .28); background: rgba(30, 64, 125, .28); color: #c7dcff; }
+.auth-flash-info > i { color: #8db8ff; }
+
+.auth-legacy-page { width: min(100%, 520px); margin: 0 auto; color: #f8fafc; }
+.auth-legacy-page > h2 { margin: 0 0 22px; color: #f8fafc; font-size: 25px; letter-spacing: -.035em; }
+.auth-legacy-form { padding: 24px; border: 1px solid rgba(148, 163, 184, .14); border-radius: 18px; background: linear-gradient(145deg, rgba(16, 28, 48, .96), rgba(8, 17, 31, .94)); box-shadow: 0 20px 48px rgba(0, 0, 0, .18); }
+.auth-legacy-form .field { margin-bottom: 17px; }
+.auth-legacy-form .field p { margin: 0 0 7px; color: #dbeafe; font-size: 12px; }
+.auth-legacy-form .field p em, .auth-legacy-form .field p i { color: #71839e; font-size: 10px; }
+.auth-legacy-form .field input:not([type="hidden"]), .auth-legacy-form .field textarea { width: 100%; max-width: 100%; box-sizing: border-box; min-height: 43px; padding: 0 12px; border: 1px solid rgba(148, 163, 184, .18); border-radius: 10px; outline: 0; background: rgba(5, 9, 18, .62); color: #f8fafc; font: inherit; font-size: 13px; }
+.auth-legacy-form .field textarea { padding: 11px 12px; }
+.auth-legacy-form .field input:focus, .auth-legacy-form .field textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(59, 130, 246, .1); }
+.auth-legacy-form .actions { display: flex; justify-content: flex-end; margin-top: 21px; }
+.auth-legacy-form .actions input[type="submit"] { min-height: 42px; padding: 0 16px; border: 1px solid rgba(129, 140, 248, .4); border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #7c3aed); color: #fff; font-size: 12px; font-weight: 800; cursor: pointer; }
+.auth-legacy-page > a { display: inline-block; margin-top: 18px; color: #9db8ff; font-size: 11px; text-decoration: none; }
+
+@media (max-width: 680px) {
+  .auth-error-summary { margin-bottom: 15px; padding: 9px 10px; }
+  .auth-field-error { font-size: 10px; }
+  .site-flash-container { width: calc(100% - 28px); margin-top: 10px; }
+  .auth-legacy-page { width: 100%; }
+  .auth-legacy-page > h2 { font-size: 22px; }
+  .auth-legacy-form { padding: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-error-summary, .auth-field-error { animation: none; }
+}

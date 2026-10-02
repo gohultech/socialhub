@@ -1,56 +1,119 @@
-<div class="container mt-5">
+<% current_username = current_user.profile&.username || current_user.email.split("@").first %>
 
-  <h2 class="mb-4">Search Users</h2>
+<div class="search-page">
+  <%= render "shared/authenticated_topbar", active_section: :search %>
+  <%= render "shared/authenticated_sidebar", active_section: :search %>
 
-  <%= form_with url: search_path, method: :get, local: true do %>
+  <main class="search-layout">
+    <section class="search-content" aria-labelledby="search-heading">
+      <header class="search-hero">
+        <div class="search-hero-icon" aria-hidden="true"><i class="bi bi-search"></i></div>
+        <span class="search-eyebrow">Explore together</span>
+        <h1 id="search-heading">Search <span>CircleHub</span></h1>
+        <p>Find people, posts, communities and discover amazing content.</p>
 
-    <div class="input-group mb-4">
+        <%= form_with url: search_path, method: :get, local: true, class: "search-main-form" do %>
+          <label class="search-main-input" for="search-query">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <%= text_field_tag :query, params[:query], id: "search-query", placeholder: "Search for people, posts, communities...", autocomplete: "off" %>
+          </label>
+          <button type="submit" class="search-submit"><i class="bi bi-search"></i><span>Search</span></button>
+        <% end %>
 
-      <%= text_field_tag :query,
-                         params[:query],
-                         class: "form-control",
-                         placeholder: "Search by username..." %>
+        <nav class="search-tabs" aria-label="Search categories">
+          <%= link_to "All", search_path(query: params[:query]), class: "search-tab is-active" %>
+          <%= link_to "People", search_path(query: params[:query]), class: "search-tab" %>
+          <span class="search-tab is-disabled" aria-disabled="true">Posts</span>
+          <span class="search-tab is-disabled" aria-disabled="true">Communities</span>
+          <span class="search-tab is-disabled" aria-disabled="true">Hashtags</span>
+        </nav>
+      </header>
 
-      <button class="btn btn-primary">
-        Search
-      </button>
-
-    </div>
-
-  <% end %>
-
-  <% if @users.any? %>
-
-    <% @users.each do |user| %>
-
-      <div class="card mb-2">
-
-        <div class="card-body">
-
-          <strong>
-            <%= link_to user.profile.username,
-                        user_path(user),
-                        class: "text-decoration-none" %>
-          </strong>
-
-          <br>
-
-          <small>
-            <%= user.email %>
-          </small>
-
+      <section class="search-recent-card" aria-labelledby="recent-searches-heading">
+        <div class="search-section-heading">
+          <div><span class="search-section-kicker">Your activity</span><h2 id="recent-searches-heading">Recent searches</h2></div>
+          <span class="search-clear-disabled">Clear all</span>
         </div>
+        <p class="search-muted"><i class="bi bi-clock-history"></i> Recent searches will appear here as you explore CircleHub.</p>
+      </section>
 
-      </div>
+      <% if @users.any? %>
+        <section class="search-results-section" aria-labelledby="people-heading">
+          <div class="search-section-heading">
+            <div><span class="search-section-kicker">People you may know</span><h2 id="people-heading">People</h2></div>
+            <span class="search-result-count"><%= pluralize(@users.count, "result") %></span>
+          </div>
+          <div class="search-people-grid">
+            <% @users.each do |user| %>
+              <% username = user.profile&.username || user.email.split("@").first %>
+              <article class="search-person-card">
+                <%= link_to user_path(user), class: "search-person-identity" do %>
+                  <% if user.profile&.avatar&.attached? %>
+                    <%= image_tag user.profile.avatar, class: "search-person-avatar", alt: "#{username}'s avatar" %>
+                  <% else %>
+                    <span class="search-person-avatar search-person-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+                  <% end %>
+                  <span><strong><%= username %></strong><small><%= user.profile&.bio.presence || "CircleHub member" %></small></span>
+                <% end %>
+                <div class="search-person-actions">
+                  <%= link_to "View profile", user_path(user), class: "search-view-profile" %>
+                  <% if user != current_user %>
+                    <% if current_user.following.include?(user) %>
+                      <%= button_to "Following", user_follow_path(user), method: :delete, class: "search-follow is-following" %>
+                    <% else %>
+                      <%= button_to "Follow", user_follow_path(user), method: :post, class: "search-follow" %>
+                    <% end %>
+                  <% end %>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        </section>
+      <% elsif params[:query].present? %>
+        <section class="search-empty-state" aria-live="polite">
+          <span class="search-empty-icon"><i class="bi bi-search"></i></span>
+          <h2>No results yet</h2>
+          <p>Search for people, posts, communities, or hashtags to discover something new.</p>
+          <small>No people matched “<%= params[:query] %>”.</small>
+        </section>
+      <% else %>
+        <section class="search-empty-state">
+          <span class="search-empty-icon"><i class="bi bi-compass"></i></span>
+          <h2>Start exploring</h2>
+          <p>Search for people, posts, communities, or hashtags to discover something new.</p>
+        </section>
+      <% end %>
+    </section>
 
-    <% end %>
+    <aside class="search-rail" aria-label="CircleHub discovery">
+      <section class="search-rail-card search-profile-card">
+        <div class="search-profile-glow"></div>
+        <% if current_user.profile&.avatar&.attached? %>
+          <%= image_tag current_user.profile.avatar, class: "search-profile-avatar", alt: "Your avatar" %>
+        <% else %>
+          <span class="search-profile-avatar search-person-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+        <% end %>
+        <strong><%= current_username %></strong>
+        <small>CircleHub member</small>
+        <%= link_to "View profile", profile_path, class: "search-rail-profile-link" %>
+      </section>
 
-  <% elsif params[:query].present? %>
+      <section class="search-rail-card search-tips-card">
+        <div class="search-section-heading"><div><span class="search-section-kicker">Discover more</span><h2>Search tips</h2></div><i class="bi bi-stars search-tip-icon"></i></div>
+        <ul>
+          <li><i class="bi bi-person"></i><span>Find people by username.</span></li>
+          <li><i class="bi bi-hash"></i><span>Try a topic or interest.</span></li>
+          <li><i class="bi bi-people"></i><span>Grow your circle together.</span></li>
+        </ul>
+      </section>
 
-    <div class="alert alert-warning">
-      No users found.
-    </div>
-
-  <% end %>
-
+      <section class="search-community-cta">
+        <span class="search-cta-orb search-cta-orb-one"></span><span class="search-cta-orb search-cta-orb-two"></span>
+        <i class="bi bi-stars"></i>
+        <h2>Good ideas find great people.</h2>
+        <p>Keep sharing. Keep growing.</p>
+        <%= link_to search_path, class: "search-cta-link" do %>Explore people <i class="bi bi-arrow-up-right"></i><% end %>
+      </section>
+    </aside>
+  </main>
 </div>

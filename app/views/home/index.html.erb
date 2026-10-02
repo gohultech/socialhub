@@ -1,206 +1,251 @@
-<div class="container py-5 text-center">
+<% if user_signed_in? %>
+  <% feed_users = @posts.map(&:user).uniq.reject { |user| user == current_user } %>
+  <% story_users = ([current_user] + feed_users).uniq.first(8) %>
+  <% suggested_users = feed_users.first(5) %>
+  <% current_username = current_user.profile&.username || current_user.email.split("@").first %>
 
-  <h1 class="display-4 fw-bold">
-    Welcome to SocialHub
-  </h1>
+  <div class="home-feed-page">
+    <%= render "shared/authenticated_topbar", active_section: :home %>
+    <%= render "shared/authenticated_sidebar", active_section: :home %>
 
-  <p class="lead mt-3">
-    Connect, Share and Build Communities.
-  </p>
+    <main class="home-feed-main" id="feed">
+      <section class="home-feed-stories" aria-label="Stories">
+        <div class="home-feed-section-heading home-feed-stories-heading"><div><span class="home-feed-kicker">Stay connected</span><h1>Stories</h1></div><%= link_to "View all", search_path, class: "home-feed-section-link" %></div>
+        <div class="home-feed-stories-list">
+          <% story_users.each do |user| %>
+            <% username = user.profile&.username || user.email.split("@").first %>
+            <%= link_to(user == current_user ? profile_path : user_path(user), class: "home-feed-story") do %>
+              <span class="home-feed-story-ring">
+                <% if user == current_user %><span class="home-feed-story-add"><i class="bi bi-plus"></i></span><% end %>
+              <% if user.profile&.avatar&.attached? %>
+                <%= image_tag user.profile.avatar, class: "home-feed-avatar", alt: "#{username}'s avatar" %>
+              <% else %>
+                <span class="home-feed-avatar home-feed-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+              <% end %>
+              </span>
+              <span><%= user == current_user ? "Your story" : username %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
 
-  <% if user_signed_in? %>
-    <%= link_to "View My Posts",
-                posts_path,
-                class: "btn btn-primary btn-lg mt-3" %>
-  <% else %>
-    <%= link_to "Get Started",
-                new_user_registration_path,
-                class: "btn btn-primary btn-lg mt-3" %>
-  <% end %>
-
-  <div class="row justify-content-center mt-5">
-    <div class="col-lg-8">
-
-      <h3 class="mb-4">Latest Posts</h3>
+      <section class="home-feed-composer" aria-label="Create a post">
+        <% if current_user.profile&.avatar&.attached? %>
+          <%= image_tag current_user.profile.avatar, class: "home-feed-avatar", alt: "#{current_username}'s avatar" %>
+        <% else %>
+          <span class="home-feed-avatar home-feed-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+        <% end %>
+        <%= link_to "What's on your mind, #{current_username}?", new_post_path, class: "home-feed-composer-prompt" %>
+        <%= link_to new_post_path, class: "home-feed-composer-create", aria: { label: "Create a post" } do %><i class="bi bi-plus-square"></i><% end %>
+      </section>
 
       <% if @posts.any? %>
-
         <% @posts.each do |post| %>
-
-          <div class="card shadow-sm mb-3">
-            <div class="card-body">
-
-              <h6 class="fw-bold text-primary mb-2">
-                <%= post.user.profile&.username || post.user.email.split("@").first %>
-              </h6>
-
-              <% if user_signed_in? && current_user != post.user %>
-
-                <% if current_user.following.include?(post.user) %>
-
-                  <%= button_to "Following",
-                                user_follow_path(post.user),
-                                method: :delete,
-                                class: "btn btn-outline-secondary btn-sm mb-2" %>
-
+          <% username = post.user.profile&.username || post.user.email.split("@").first %>
+          <article class="home-feed-post" id="post-<%= post.id %>">
+            <header class="home-feed-post-header">
+              <%= link_to user_path(post.user), class: "home-feed-user" do %>
+                <% if post.user.profile&.avatar&.attached? %>
+                  <%= image_tag post.user.profile.avatar, class: "home-feed-avatar", alt: "#{username}'s avatar" %>
                 <% else %>
-
-                  <%= button_to "Follow",
-                                user_follow_path(post.user),
-                                method: :post,
-                                class: "btn btn-primary btn-sm mb-2" %>
-
+                  <span class="home-feed-avatar home-feed-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
                 <% end %>
-
+                <span><strong><%= username %></strong><small><%= time_ago_in_words(post.created_at) %> ago</small></span>
               <% end %>
 
-              <p class="mb-2">
-                <%= render_hashtags(post.content) %>
-              </p>
-
-              <% if post.image.attached? %>
-                <div class="mt-3 mb-3">
-                  <%= image_tag post.image,
-                                class: "img-fluid rounded" %>
-                </div>
-              <% end %>
-
-              <small class="text-muted">
-                <%= time_ago_in_words(post.created_at) %> ago
-              </small>
-
-              <% if user_signed_in? %>
-
-                <div class="d-flex justify-content-between align-items-center mt-3">
-
-                  <% if current_user.likes.exists?(post: post) %>
-
-                    <%= button_to "❤️ Unlike",
-                                  post_like_path(post),
-                                  method: :delete,
-                                  class: "btn btn-danger btn-sm" %>
-
+              <div class="home-feed-post-header-actions">
+                <% if current_user != post.user %>
+                  <% if current_user.following.include?(post.user) %>
+                    <%= button_to "Following", user_follow_path(post.user), method: :delete, class: "home-feed-follow is-following" %>
                   <% else %>
-
-                    <%= button_to "🤍 Like",
-                                  post_like_path(post),
-                                  method: :post,
-                                  class: "btn btn-outline-danger btn-sm" %>
-
+                    <%= button_to "Follow", user_follow_path(post.user), method: :post, class: "home-feed-follow" %>
                   <% end %>
-
-                  <div class="mt-2">
-
-                    <% if current_user.saved.include?(post) %>
-
-                      <%= button_to "🔖 Saved",
-                                    post_saved_post_path(post),
-                                    method: :delete,
-                                    class: "btn btn-outline-warning btn-sm" %>
-
-                    <% else %>
-
-                      <%= button_to "🔖 Save",
-                                    post_saved_post_path(post),
-                                    method: :post,
-                                    class: "btn btn-outline-dark btn-sm" %>
-
-                    <% end %>
-
-                  </div>
-
-                  <small class="text-muted">
-                    <%= pluralize(post.likes.count, "Like") %>
-                  </small>
-
-                </div>
-
-              <% end %>
-
-              <hr>
-
-              <h6 class="fw-bold">Comments</h6>
-
-              <% if post.comments.any? %>
-
-                <% post.comments.each do |comment| %>
-
-                  <div class="border rounded p-2 mb-2 text-start">
-
-                    <strong class="text-primary">
-                      <%= comment.user.profile&.username || comment.user.email.split("@").first %>
-                    </strong>
-
-                    <p class="mb-1">
-                      <%= comment.content %>
-                    </p>
-
-                    <small class="text-muted">
-                      <%= time_ago_in_words(comment.created_at) %> ago
-                    </small>
-
-                    <% if user_signed_in? && comment.user == current_user %>
-
-                      <div class="mt-2 d-flex gap-2">
-
-                        <%= link_to "Edit",
-                                    edit_post_comment_path(post, comment),
-                                    class: "btn btn-outline-primary btn-sm" %>
-
-                        <%= button_to "Delete",
-                                      post_comment_path(post, comment),
-                                      method: :delete,
-                                      class: "btn btn-outline-danger btn-sm" %>
-                      </div>
-
-                    <% end %>
-
-                  </div>
-
+                  <span class="home-feed-more" aria-hidden="true"><i class="bi bi-three-dots"></i></span>
+                <% else %>
+                  <%= link_to edit_post_path(post), class: "home-feed-more", aria: { label: "Edit post" } do %><i class="bi bi-three-dots"></i><% end %>
                 <% end %>
+              </div>
+            </header>
 
-              <% else %>
-
-                <p class="text-muted">
-                  No comments yet.
-                </p>
-
-              <% end %>
-
-              <% if user_signed_in? %>
-
-                <%= form_with model: [post, Comment.new], local: true do |f| %>
-
-                  <div class="mb-2">
-
-                    <%= f.text_area :content,
-                                    rows: 2,
-                                    class: "form-control",
-                                    placeholder: "Write a comment..." %>
-
-                  </div>
-
-                  <%= f.submit "Add Comment",
-                               class: "btn btn-primary btn-sm" %>
-
-                <% end %>
-
-              <% end %>
-
+            <div class="home-feed-caption home-feed-caption-before-media">
+              <%= render_mentions(render_hashtags(post.content)) %>
             </div>
-          </div>
 
+            <% if post.image.attached? %>
+              <%= image_tag post.image, class: "home-feed-media", alt: "Post by #{username}" %>
+            <% end %>
+
+            <div class="home-feed-post-actions">
+              <div class="home-feed-action-group">
+                <% if current_user.likes.exists?(post: post) %>
+                  <%= button_to post_like_path(post), method: :delete, class: "home-feed-icon-button is-liked", aria: { label: "Unlike post" } do %><i class="bi bi-heart-fill"></i><% end %>
+                <% else %>
+                  <%= button_to post_like_path(post), method: :post, class: "home-feed-icon-button", aria: { label: "Like post" } do %><i class="bi bi-heart"></i><% end %>
+                <% end %>
+                <a href="#comments-<%= post.id %>" class="home-feed-icon-button" aria-label="View comments"><i class="bi bi-chat"></i></a>
+                <a href="#post-<%= post.id %>" class="home-feed-icon-button" aria-label="Share post"><i class="bi bi-send"></i></a>
+              </div>
+              <% if current_user.saved.include?(post) %>
+                <%= button_to post_saved_post_path(post), method: :delete, class: "home-feed-icon-button is-saved", aria: { label: "Unsave post" } do %><i class="bi bi-bookmark-fill"></i><% end %>
+              <% else %>
+                <%= button_to post_saved_post_path(post), method: :post, class: "home-feed-icon-button", aria: { label: "Save post" } do %><i class="bi bi-bookmark"></i><% end %>
+              <% end %>
+            </div>
+
+            <div class="home-feed-post-details">
+              <strong><%= pluralize(post.likes.count, "like") %></strong>
+              <% unless post.image.attached? %><p class="home-feed-caption"><strong><%= username %></strong> <%= render_mentions(render_hashtags(post.content)) %></p><% end %>
+              <% if post.comments.any? %>
+                <a href="#comments-<%= post.id %>" class="home-feed-comment-count">View <%= pluralize(post.comments.count, "comment") %></a>
+                <div class="home-feed-comments" id="comments-<%= post.id %>">
+                  <% post.comments.each do |comment| %>
+                    <% comment_username = comment.user.profile&.username || comment.user.email.split("@").first %>
+                    <div class="home-feed-comment">
+                      <p><strong><%= comment_username %></strong> <%= comment.content %></p>
+                      <% if comment.user == current_user %>
+                        <span class="home-feed-comment-controls">
+                          <%= link_to "Edit", edit_post_comment_path(post, comment) %>
+                          <%= button_to "Delete", post_comment_path(post, comment), method: :delete %>
+                        </span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+              <time datetime="<%= post.created_at.iso8601 %>"><%= post.created_at.strftime("%b %-d, %Y") %></time>
+            </div>
+
+            <%= form_with model: [post, Comment.new], local: true, class: "home-feed-comment-form" do |f| %>
+              <%= f.text_field :content, placeholder: "Add a comment...", aria: { label: "Add a comment" } %>
+              <%= f.submit "Post" %>
+            <% end %>
+          </article>
         <% end %>
-
       <% else %>
-
-        <div class="alert alert-info">
-          No posts available.
-        </div>
-
+        <section class="home-feed-empty">
+          <i class="bi bi-images"></i>
+          <h1>Your feed is quiet.</h1>
+          <p>Follow people and explore communities to see conversations here.</p>
+          <%= link_to "Explore communities", search_path %>
+        </section>
       <% end %>
+    </main>
 
-    </div>
+    <aside class="home-feed-rightbar" id="explore">
+      <section class="home-feed-current-user">
+        <%= link_to profile_path, class: "home-feed-user" do %>
+          <% if current_user.profile&.avatar&.attached? %>
+            <%= image_tag current_user.profile.avatar, class: "home-feed-avatar", alt: "#{current_username}'s avatar" %>
+          <% else %>
+            <span class="home-feed-avatar home-feed-avatar-placeholder"><i class="bi bi-person-fill"></i></span>
+          <% end %>
+          <span><strong><%= current_username %></strong><small>CircleHub member</small></span>
+        <% end %>
+        <%= link_to "View profile", profile_path, class: "home-feed-profile-link" %>
+        <div class="home-feed-profile-stats" aria-label="Profile stats">
+          <span><strong><%= current_user.posts.count %></strong><small>Posts</small></span>
+          <span><strong><%= current_user.followers.count %></strong><small>Followers</small></span>
+          <span><strong><%= current_user.following.count %></strong><small>Following</small></span>
+        </div>
+      </section>
+
+      <section class="home-feed-discovery">
+        <div class="home-feed-section-heading"><h2>Suggested for you</h2><%= link_to "See all", search_path, class: "home-feed-section-link" %></div>
+        <% if suggested_users.any? %>
+          <% suggested_users.each do |user| %>
+            <% username = user.profile&.username || user.email.split("@").first %>
+            <div class="home-feed-suggestion">
+              <%= link_to user_path(user), class: "home-feed-user" do %>
+                <% if user.profile&.avatar&.attached? %><%= image_tag user.profile.avatar, class: "home-feed-avatar", alt: "#{username}'s avatar" %><% else %><span class="home-feed-avatar home-feed-avatar-placeholder"><i class="bi bi-person-fill"></i></span><% end %>
+                <span><strong><%= username %></strong><small>Suggested for you</small></span>
+              <% end %>
+              <% if current_user.following.include?(user) %>
+                <%= button_to "Following", user_follow_path(user), method: :delete, class: "home-feed-follow is-following" %>
+              <% else %>
+                <%= button_to "Follow", user_follow_path(user), method: :post, class: "home-feed-follow" %>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="home-feed-muted">New people will appear here as the community grows.</p>
+        <% end %>
+      </section>
+
+      <section class="home-feed-discovery">
+        <div class="home-feed-section-heading"><h2>Trending</h2></div>
+        <% if @trending_hashtags.any? %>
+          <div class="home-feed-tags">
+            <% @trending_hashtags.each do |tag, count| %>
+              <%= link_to hashtag_path(tag.delete("#")), class: "home-feed-tag" do %><span><%= tag %></span><small><%= count %> posts</small><% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="home-feed-muted">No trending hashtags yet.</p>
+        <% end %>
+      </section>
+
+      <section class="home-feed-community-cta">
+        <span class="home-feed-cta-orb home-feed-cta-orb-one"></span><span class="home-feed-cta-orb home-feed-cta-orb-two"></span>
+        <i class="bi bi-stars"></i>
+        <h2>Good ideas find great people.</h2>
+        <p>Keep sharing. Keep growing.</p>
+        <%= link_to search_path, class: "home-feed-cta-link" do %>Explore communities <i class="bi bi-arrow-up-right"></i><% end %>
+      </section>
+
+      <footer class="home-feed-footer">A place to connect, discover, and belong.<br>© <%= Time.current.year %> CircleHub</footer>
+    </aside>
+
   </div>
 
-</div>
+<% else %>
+
+  <div class="public-landing">
+    <header class="public-header">
+      <div class="public-container public-header-inner">
+        <%= link_to root_path, class: "public-brand", aria: { label: "CircleHub home" } do %>
+          <span class="public-brand-mark"><i class="bi bi-people-fill"></i></span>
+          <span>Circle<span>Hub</span></span>
+        <% end %>
+        <button class="public-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavigation" aria-controls="publicNavigation" aria-expanded="false" aria-label="Toggle navigation"><i class="bi bi-list"></i></button>
+        <nav class="public-navigation collapse" id="publicNavigation" aria-label="Main navigation">
+          <%= link_to "Home", root_path, class: "is-active" %><%= link_to "Features", root_path(anchor: "features") %><%= link_to "Communities", root_path(anchor: "communities") %><%= link_to "Explore", search_path %><%= link_to "About", root_path(anchor: "how-it-works") %>
+        </nav>
+        <div class="public-header-actions"><%= link_to search_path, class: "public-search", aria: { label: "Search CircleHub" } do %><i class="bi bi-search"></i><% end %><%= link_to "Log in", new_user_session_path, class: "public-login" %><%= link_to "Create account", new_user_registration_path, class: "public-button public-button-small" %></div>
+      </div>
+    </header>
+
+    <main>
+      <section class="public-hero public-container">
+        <div class="public-hero-copy public-reveal">
+          <div class="public-eyebrow"><span>⚡</span> A modern space for real connections</div>
+          <h1>Connect with people who <span>truly matter.</span></h1>
+          <p class="public-hero-lead">CircleHub is a vibrant community platform where you can share ideas, join meaningful conversations, discover communities, and be part of something bigger.</p>
+          <div class="public-hero-actions"><%= link_to new_user_registration_path, class: "public-button" do %>Get started <i class="bi bi-arrow-right"></i><% end %><%= link_to root_path(anchor: "communities"), class: "public-button public-button-ghost" do %><i class="bi bi-compass"></i> Explore communities<% end %></div>
+          <div class="public-proof"><div class="public-avatar-stack" aria-hidden="true"><span class="public-avatar avatar-one">A</span><span class="public-avatar avatar-two">M</span><span class="public-avatar avatar-three">S</span><span class="public-avatar avatar-four">J</span><span class="public-avatar avatar-five"><i class="bi bi-plus"></i></span></div><div><strong>Join 50,000+ members</strong><span>and grow your circle today.</span></div></div>
+        </div>
+        <div class="public-hero-visual public-reveal public-reveal-delay" aria-label="A preview of the CircleHub community experience">
+          <div class="public-visual-orb public-orb-one"></div><div class="public-visual-orb public-orb-two"></div>
+          <div class="public-float-card public-float-share"><i class="bi bi-heart"></i><strong>Share</strong><span>Moments</span></div><div class="public-float-card public-float-discover"><i class="bi bi-globe2"></i><strong>Discover</strong><span>New people</span></div><div class="public-float-card public-float-join"><i class="bi bi-people"></i><strong>Join</strong><span>Communities</span></div><div class="public-float-card public-float-grow"><i class="bi bi-arrow-up-right"></i><strong>Grow</strong><span>Together</span></div>
+          <article class="public-post-card"><header class="public-post-header"><span class="public-post-avatar">L</span><div><strong>lena.morgan</strong><span>2h · <i class="bi bi-globe2"></i></span></div><i class="bi bi-three-dots public-post-menu"></i></header><div class="public-post-image"><div class="public-mountain mountain-back"></div><div class="public-mountain mountain-front"></div><span class="public-image-label"><i class="bi bi-geo-alt-fill"></i> Banff, Canada</span></div><div class="public-post-body"><div class="public-post-caption">Good people,<br><strong>brighter places.</strong> 🏔️</div><div class="public-post-actions"><span><i class="bi bi-heart-fill"></i> 2.4k</span><span><i class="bi bi-chat"></i> 184</span><span class="public-post-action-right"><i class="bi bi-send"></i><i class="bi bi-bookmark"></i></span></div></div></article>
+        </div>
+      </section>
+
+      <section class="public-feature-strip public-container" id="features" aria-label="CircleHub features">
+        <% [["bi-link-45deg", "Meaningful connections", "Meet people who share your interests"], ["bi-chat-heart", "Engaging conversations", "Discuss, learn, and share ideas"], ["bi-people", "Diverse communities", "Join or create communities on any topic"], ["bi-camera", "Share your moments", "Photos, thoughts, and more"], ["bi-shield-check", "A safe, positive space", "Respect, privacy, and real people"]].each do |icon, title, description| %><div class="public-feature-item"><span class="public-feature-icon"><i class="bi <%= icon %>"></i></span><div><h3><%= title %></h3><p><%= description %></p></div></div><% end %>
+      </section>
+
+      <section class="public-stats public-container"><div class="public-stats-grid"><% [["50K+", "Active members", "bi-person-check"], ["2K+", "Communities", "bi-people"], ["100K+", "Posts & discussions", "bi-bar-chart"], ["4.9/5", "User satisfaction", "bi-stars"]].each do |value, label, icon| %><div class="public-stat"><i class="bi <%= icon %>"></i><div><strong><%= value %></strong><span><%= label %></span></div></div><% end %></div><div class="public-stats-cta"><span>Be a part of something amazing.</span><%= link_to "Create your account", new_user_registration_path, class: "public-button public-button-small" %></div></section>
+
+      <section class="public-section public-container public-value-section"><div class="public-section-heading"><div><span class="public-section-kicker">Your world, connected</span><h2>Everything you need to build your circle</h2></div><p>From your first hello to your hundredth shared moment, CircleHub gives you the tools to feel at home online.</p></div><div class="public-value-grid"><% [["01", "Discover people", "Find new perspectives and people who make your world feel a little bigger.", "bi-compass"], ["02", "Join communities", "Follow your curiosity into welcoming spaces built around what you love.", "bi-people"], ["03", "Share updates", "Turn everyday thoughts and moments into conversations that matter.", "bi-image"], ["04", "Start conversations", "Make the first move with simple, genuine ways to connect.", "bi-chat-square-heart"]].each do |number, title, description, icon| %><article class="public-value-card"><span class="public-card-number"><%= number %></span><span class="public-value-icon"><i class="bi <%= icon %>"></i></span><h3><%= title %></h3><p><%= description %></p><i class="bi bi-arrow-up-right public-card-arrow"></i></article><% end %></div></section>
+
+      <section class="public-section public-container" id="communities"><div class="public-section-heading"><div><span class="public-section-kicker">Find your people</span><h2>Find communities that feel like home</h2></div><%= link_to "Explore all communities", search_path, class: "public-text-link" %></div><div class="public-community-grid"><% [["Technology", "24.8k members", "bi-cpu", "community-blue"], ["Photography", "18.2k members", "bi-camera", "community-violet"], ["Fitness", "12.6k members", "bi-activity", "community-green"], ["Travel", "31.4k members", "bi-airplane", "community-orange"], ["Music", "9.8k members", "bi-music-note-beamed", "community-pink"], ["Gaming", "22.1k members", "bi-controller", "community-indigo"]].each do |name, members, icon, color| %><article class="public-community-card"><span class="public-community-icon <%= color %>"><i class="bi <%= icon %>"></i></span><div><h3><%= name %></h3><p><%= members %></p></div><%= link_to "Join", new_user_registration_path, class: "public-join-link" %></article><% end %></div></section>
+
+      <section class="public-section public-container public-steps" id="how-it-works"><div class="public-section-heading"><div><span class="public-section-kicker">Simple by design</span><h2>How CircleHub works</h2></div><p>A more human way to find connection, built around the way real communities grow.</p></div><div class="public-steps-grid"><% [["01", "Create your profile", "Tell the community what makes you, you."], ["02", "Discover your people", "Explore conversations and spaces made for your interests."], ["03", "Connect & share", "Show up, start talking, and grow your circle."]].each do |number, title, description| %><div class="public-step"><span><%= number %></span><div><h3><%= title %></h3><p><%= description %></p></div></div><% end %></div></section>
+
+      <section class="public-final-cta public-container"><div class="public-final-cta-glow"></div><div><span class="public-section-kicker">Your next chapter starts here</span><h2>Your people are out there.<br><span>Start your circle today.</span></h2><p>Come as you are. Find a place to belong, share what matters, and make room for something new.</p></div><div class="public-final-actions"><%= link_to "Create account", new_user_registration_path, class: "public-button" %><%= link_to "Explore communities", search_path, class: "public-button public-button-ghost" %></div></section>
+    </main>
+
+    <footer class="public-footer"><div class="public-container"><div class="public-footer-main"><div class="public-footer-brand"><%= link_to root_path, class: "public-brand" do %><span class="public-brand-mark"><i class="bi bi-people-fill"></i></span><span>Circle<span>Hub</span></span><% end %><p>A place to connect, discover, share, and belong.</p></div><div class="public-footer-links"><div><h3>Product</h3><%= link_to "Features", root_path(anchor: "features") %><%= link_to "Communities", root_path(anchor: "communities") %><%= link_to "Explore", search_path %></div><div><h3>Community</h3><%= link_to "Get started", new_user_registration_path %><%= link_to "Log in", new_user_session_path %><%= link_to "About us", root_path(anchor: "how-it-works") %></div><div><h3>Company</h3><%= link_to "Privacy", new_user_registration_path %><%= link_to "Terms", new_user_registration_path %><%= link_to "Contact", new_user_registration_path %></div></div></div><div class="public-footer-bottom"><span>© 2026 CircleHub. All rights reserved.</span><span>Made for real connections <i class="bi bi-heart-fill"></i></span></div></div></footer>
+  </div>
+
+<% end %>
